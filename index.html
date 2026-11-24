@@ -177,6 +177,9 @@ body.nogl .gl-only { display: none !important; }
   #flash.go { animation: none; }
   .btn, .tag, #canopy { transition: none; }
 }
+#hud, #labels { transition: opacity .9s ease; }
+body.intro #hud, body.intro #labels { opacity: 0; }
+body.intro #hud *, body.intro #labels * { pointer-events: none !important; }
 </style>
 </head>
 <body>
@@ -469,7 +472,7 @@ const stars = (() => {
 })();
 
 /* Lights */
-scene.add(new THREE.AmbientLight(0x6a76a8, 0.42));
+const ambient = new THREE.AmbientLight(0x6a76a8, 0.42); scene.add(ambient);
 const sun = new THREE.DirectionalLight(0xfff0dc, 1.7); sun.position.set(-0.8, 0.7, 0.55); scene.add(sun);
 const rimL = new THREE.DirectionalLight(0x6fb6ff, 0.5); rimL.position.set(0.9, -0.2, -0.6); scene.add(rimL);
 
@@ -525,6 +528,7 @@ function drawDeck() {
   if (deckTexture) deckTexture.needsUpdate = true;
 }
 const hangar = new THREE.Group(); scene.add(hangar);
+const hangarLights = [];
 const runway = [];
 (function buildHangar() {
   deckCanvas = canvas(1024, 1152); drawDeck(); deckTexture = tex(deckCanvas);
@@ -560,10 +564,58 @@ const runway = [];
   }
   const l1 = new THREE.PointLight(0xffd9a0, 1.3, 60, 2); l1.position.set(0, 13, 14); hangar.add(l1);
   const l2 = new THREE.PointLight(0x7fd8ff, 0.9, 50, 2); l2.position.set(0, 10, -12); hangar.add(l2);
+  hangarLights.push([l1, 1.3], [l2, 0.9]);
 })();
 if (document.fonts && document.fonts.load) {
   Promise.all([document.fonts.load("700 92px 'Big Shoulders Stencil Display'"), document.fonts.load("500 26px 'IBM Plex Mono'")]).then(drawDeck).catch(() => {});
 }
+
+/* ---------- Hangar doors, dust and light shafts ---------- */
+const doors = [];
+let seamMat;
+(function buildDoors() {
+  const c = canvas(256, 256), g = c.getContext("2d");
+  g.fillStyle = "#1b2030"; g.fillRect(0, 0, 256, 256);
+  g.strokeStyle = "rgba(0,0,0,.55)"; g.lineWidth = 3;
+  for (let y = 0; y <= 256; y += 32) { g.beginPath(); g.moveTo(0, y); g.lineTo(256, y); g.stroke(); }
+  g.fillStyle = "rgba(143,232,255,.10)"; for (let y = 14; y < 256; y += 64) g.fillRect(18, y, 220, 5);
+  const t = tex(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(2, 2);
+  const m = new THREE.MeshStandardMaterial({ map: t, metalness: .6, roughness: .5 });
+  seamMat = new THREE.MeshBasicMaterial({ color: 0xffb020, toneMapped: false });
+  for (const s of [-1, 1]) {
+    const d = new THREE.Group();
+    d.add(new THREE.Mesh(new THREE.BoxGeometry(20.6, 19.4, 0.8), m));
+    const e = new THREE.Mesh(new THREE.BoxGeometry(0.2, 19.4, 0.9), seamMat); e.position.x = -s * 10.3; d.add(e);
+    d.position.set(s * 10.3, 5.6, DOOR_Z - 0.6);
+    hangar.add(d); doors.push({ d, s });
+  }
+})();
+function setDoors(k) { for (const o of doors) o.d.position.x = o.s * (10.3 + k * 21); }
+const dust = (() => {
+  const n = coarse ? 160 : 320, pos = new Float32Array(n * 3), r = rng(5);
+  for (let i = 0; i < n; i++) pos.set([(r() * 2 - 1) * 20, -3.5 + r() * 18, DOOR_Z + r() * 50], i * 3);
+  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  const p = new THREE.Points(g, new THREE.PointsMaterial({ size: 0.12, map: glowTex, color: 0xffe2b0, transparent: true, opacity: .6, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false }));
+  p.frustumCulled = false; hangar.add(p); return p;
+})();
+function updateDust(dt) {
+  const a = dust.geometry.attributes.position, p = a.array;
+  for (let i = 1; i < p.length; i += 3) {
+    p[i] += dt * (0.1 + (i % 7) * 0.025); if (p[i] > 14) p[i] = -3.5;
+    p[i - 1] += Math.sin(time * 0.4 + i) * dt * 0.08;
+  }
+  a.needsUpdate = true;
+}
+(function shafts() {
+  const c = canvas(4, 128), g = c.getContext("2d"), gr = g.createLinearGradient(0, 0, 0, 128);
+  gr.addColorStop(0, "rgba(255,236,200,0)"); gr.addColorStop(.06, "rgba(255,236,200,.6)"); gr.addColorStop(1, "rgba(255,236,200,0)");
+  g.fillStyle = gr; g.fillRect(0, 0, 4, 128);
+  const m = new THREE.MeshBasicMaterial({ map: tex(c), transparent: true, opacity: .13, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, toneMapped: false, fog: false });
+  for (const [x, z] of [[-9, -2], [9, -2], [-9, 12], [9, 12], [-9, 26], [9, 26]]) {
+    const cone = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 4.4, 19, 24, 1, true), m);
+    cone.position.set(x, 5.9, z); hangar.add(cone);
+  }
+})();
 
 /* ---------- Ship (original design: swept delta with twin pods) ---------- */
 const ship = new THREE.Group(), shipBody = new THREE.Group(); ship.add(shipBody); scene.add(ship);
@@ -633,6 +685,19 @@ function planetTexture(w) {
   return tex(c);
 }
 
+const cloudTex = (() => {
+  const c = canvas(512, 256), g = c.getContext("2d"), r = rng(77);
+  for (let k = 0; k < 150; k++) {
+    const x = r() * 512, y = 22 + r() * 212, rx = 20 + r() * 70, ry = 4 + r() * 12, a = .22 + r() * .35;
+    for (const dx of [-512, 0, 512]) {
+      const cx = x + dx;
+      g.save(); g.translate(cx, y); g.scale(1, ry / rx);
+      const gr = g.createRadialGradient(0, 0, 0, 0, 0, rx); gr.addColorStop(0, `rgba(255,255,255,${a})`); gr.addColorStop(1, "rgba(255,255,255,0)");
+      g.fillStyle = gr; g.fillRect(-rx, -rx, rx * 2, rx * 2); g.restore();
+    }
+  }
+  return tex(c);
+})();
 const worldObjs = [];
 const pickables = [];
 WORLDS.forEach((w) => {
@@ -644,6 +709,11 @@ WORLDS.forEach((w) => {
   const atmo = new THREE.Mesh(new THREE.SphereGeometry(R * 1.12, 40, 24), new THREE.ShaderMaterial({ vertexShader: atmoVS, fragmentShader: atmoFS, uniforms: { c: { value: col } }, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false }));
   grp.add(atmo);
   const halo = glow(col, R * 5.2, .38); grp.add(halo);
+  let clouds = null;
+  if (w.kind !== "craters") {
+    clouds = new THREE.Mesh(new THREE.SphereGeometry(R * 1.025, 40, 24), new THREE.MeshStandardMaterial({ map: cloudTex, transparent: true, opacity: .6, depthWrite: false, roughness: 1, metalness: 0 }));
+    clouds.rotation.z = planet.rotation.z; grp.add(clouds);
+  }
   if (w.kind === "bands") {
     const rg = new THREE.Mesh(new THREE.RingGeometry(R * 1.45, R * 2.05, 64), new THREE.MeshBasicMaterial({ color: col.clone().multiplyScalar(.7), transparent: true, opacity: .35, side: THREE.DoubleSide, depthWrite: false }));
     rg.rotation.x = Math.PI / 2.3; rg.rotation.y = .3; grp.add(rg);
@@ -654,6 +724,8 @@ WORLDS.forEach((w) => {
   gate.add(new THREE.Mesh(new THREE.TorusGeometry(GR, 0.11, 10, 96), new THREE.MeshBasicMaterial({ color: col, toneMapped: false })));
   const film = new THREE.Mesh(new THREE.CircleGeometry(GR, 64), new THREE.ShaderMaterial({ vertexShader: filmVS, fragmentShader: filmFS, uniforms: { t: { value: 0 }, c: { value: col }, a: { value: 1 } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide }));
   gate.add(film);
+  const pulseM = new THREE.Mesh(new THREE.RingGeometry(GR * 0.97, GR * 1.07, 96), new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, toneMapped: false }));
+  pulseM.visible = false; gate.add(pulseM);
   const pylons = new THREE.Group(); gate.add(pylons);
   const pm = new THREE.MeshStandardMaterial({ color: 0x2a3045, metalness: .8, roughness: .35 });
   const tipM = new THREE.MeshBasicMaterial({ color: col, toneMapped: false });
@@ -673,9 +745,85 @@ WORLDS.forEach((w) => {
   tag.innerHTML = `<span class="code">${w.code}</span><span class="nm">${esc(w.short || w.name)}</span><span class="st k-${w.status[1]}"><span class="dot"></span>${esc(w.status[0])}</span>`;
   tag.setAttribute("aria-label", `Fly to ${w.name}, ${w.status[0]}`);
   tag.addEventListener("click", () => flyTo(w.i));
+  tag.addEventListener("pointerenter", () => { if (state.mode === "overview") hover = w.i; });
+  tag.addEventListener("pointerleave", () => { if (hover === w.i) hover = -1; });
   ui.labels.appendChild(tag);
-  worldObjs.push({ w, grp, planet, film, pylons, gate, R, GR, tag, spin: 0.04 + (w.i % 4) * 0.015 });
+  worldObjs.push({ w, grp, planet, film, pylons, gate, R, GR, tag, halo, clouds, col, hk: 0, surge: 0, pulse: { m: pulseM, t: -1 }, spin: 0.04 + (w.i % 4) * 0.015 });
 });
+
+function pulseWorld(i) { const p = worldObjs[i].pulse; p.t = 0; p.m.visible = true; }
+
+/* ---------- Warp streaks ---------- */
+scene.add(camera);
+const warp = (() => {
+  const n = coarse ? 220 : 420, pos = new Float32Array(n * 6), col = new Float32Array(n * 6), seeds = [], r = rng(99);
+  for (let i = 0; i < n; i++) { const a = r() * Math.PI * 2, rad = 3 + Math.pow(r(), 0.6) * 38; seeds.push({ x: Math.cos(a) * rad, y: Math.sin(a) * rad, z: -20 - r() * 380, s: 0.6 + r() * 0.8 }); }
+  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3)); g.setAttribute("color", new THREE.BufferAttribute(col, 3));
+  const l = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, fog: false, toneMapped: false }));
+  l.frustumCulled = false; l.visible = false; camera.add(l);
+  return { l, seeds, pos, col, k: 0, tint: new THREE.Color(0xbfe9ff), base: new THREE.Color(0xbfe9ff) };
+})();
+function updateWarp(dt, target, tint) {
+  warp.k += (target - warp.k) * (1 - Math.exp(-dt * 6));
+  const k = warp.k; warp.l.visible = k > 0.01; if (!warp.l.visible) return;
+  warp.l.material.opacity = Math.min(1, k * 1.3);
+  warp.tint.lerp(tint || warp.base, 1 - Math.exp(-dt * 3));
+  const speed = 60 + 560 * k, len = 2 + 50 * k, t = warp.tint;
+  for (let i = 0; i < warp.seeds.length; i++) {
+    const s = warp.seeds[i]; s.z += speed * s.s * dt; if (s.z > -2) s.z -= 400;
+    const o = i * 6;
+    warp.pos[o] = s.x; warp.pos[o + 1] = s.y; warp.pos[o + 2] = s.z;
+    warp.pos[o + 3] = s.x; warp.pos[o + 4] = s.y; warp.pos[o + 5] = s.z - len * s.s;
+    warp.col[o] = t.r; warp.col[o + 1] = t.g; warp.col[o + 2] = t.b; warp.col[o + 3] = 0; warp.col[o + 4] = 0; warp.col[o + 5] = 0;
+  }
+  warp.l.geometry.attributes.position.needsUpdate = true; warp.l.geometry.attributes.color.needsUpdate = true;
+}
+
+/* ---------- Space traffic ---------- */
+const traffic = [];
+(function buildTraffic() {
+  const bodyM = new THREE.MeshStandardMaterial({ color: 0xcfd5e4, metalness: .6, roughness: .4 });
+  const r = rng(42), TN = 32;
+  for (let k = 0; k < (coarse ? 3 : 6); k++) {
+    const g = new THREE.Group();
+    const b = new THREE.Mesh(new THREE.ConeGeometry(0.24, 1.0, 8), bodyM); b.rotation.x = Math.PI / 2; g.add(b);
+    const c = [0x8fe8ff, 0xffb020, 0xb98bff][k % 3];
+    const gl = glow(c, 1.6, .9); gl.position.z = -0.55; g.add(gl);
+    const tp = new Float32Array(TN * 3), tc = new Float32Array(TN * 3);
+    const tg = new THREE.BufferGeometry(); tg.setAttribute("position", new THREE.BufferAttribute(tp, 3)); tg.setAttribute("color", new THREE.BufferAttribute(tc, 3));
+    const trail = new THREE.Line(tg, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: .85, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }));
+    trail.frustumCulled = false;
+    scene.add(g); scene.add(trail);
+    traffic.push({ g, trail, tp, tc, TN, col: new THREE.Color(c), hist: [], acc: 0, a: r() * Math.PI * 2, sp: (0.05 + r() * 0.06) * (k % 2 ? 1 : -1), rx: 52 + r() * 40, rz: 12 + r() * 14, cy: -6 + r() * 26, cz: -82 - r() * 18, ph: r() * 6 });
+  }
+})();
+function updateTraffic(dt) {
+  for (const s of traffic) {
+    s.a += s.sp * dt;
+    const at = (a, out) => out.set(Math.cos(a) * s.rx, s.cy + Math.sin(a * 2 + s.ph) * 3, s.cz + Math.sin(a) * s.rz);
+    at(s.a, s.g.position); at(s.a + Math.sign(s.sp) * 0.02, tmp2); s.g.lookAt(tmp2);
+    s.acc += dt;
+    if (s.acc > 0.045 || !s.hist.length) { s.acc = 0; s.hist.unshift(s.g.position.clone()); if (s.hist.length > s.TN) s.hist.pop(); }
+    else s.hist[0].copy(s.g.position);
+    for (let j = 0; j < s.TN; j++) {
+      const h = s.hist[Math.min(j, s.hist.length - 1)], f = Math.pow(1 - j / (s.TN - 1), 1.5);
+      s.tp[j * 3] = h.x; s.tp[j * 3 + 1] = h.y; s.tp[j * 3 + 2] = h.z;
+      s.tc[j * 3] = s.col.r * f; s.tc[j * 3 + 1] = s.col.g * f; s.tc[j * 3 + 2] = s.col.b * f;
+    }
+    s.trail.geometry.attributes.position.needsUpdate = true; s.trail.geometry.attributes.color.needsUpdate = true;
+  }
+}
+
+/* ---------- Intro: power on, doors open ---------- */
+function startIntro() {
+  state.intro = { t: 0 }; document.body.classList.add("intro"); setDoors(0);
+  hangarLights.forEach(([l]) => { l.intensity = 0; }); ambient.intensity = 0.12;
+}
+function endIntro() {
+  if (!state.intro) return;
+  state.intro = null; document.body.classList.remove("intro"); setDoors(1);
+  hangarLights.forEach(([l, v]) => { l.intensity = v; }); ambient.intensity = 0.42; seamMat.color.setHex(0xffb020);
+}
 
 /* ---------- Layout ---------- */
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
@@ -724,6 +872,7 @@ function setHash(h) {
 }
 
 function flyTo(i, opts = {}) {
+  endIntro();
   closeManifest();
   const w = WORLDS[i], from = state.mode;
   state.current = i;
@@ -731,7 +880,7 @@ function flyTo(i, opts = {}) {
   const end = arrivalPose(i);
   if (opts.instant || reduceMotion) {
     ship.visible = false; camera.position.copy(end.pos); lookCur.copy(end.look);
-    state.mode = "arrived"; setMode("arrived"); showScreen(w); flash(); return;
+    state.mode = "arrived"; setMode("arrived"); showScreen(w); flash(); pulseWorld(i); return;
   }
   const start = camera.position.clone();
   let pts;
@@ -757,6 +906,7 @@ function goHome() {
   state.mode = "returning"; setMode("returning");
 }
 function startPilot() {
+  endIntro();
   closeManifest(); setHash("");
   state.mode = "pilot"; setMode("pilot");
   dockShip();
@@ -776,6 +926,7 @@ function pick(e) {
 }
 let downAt = null, hover = -1;
 cv.addEventListener("pointerdown", (e) => {
+  if (state.intro) { endIntro(); return; }
   downAt = { x: e.clientX, y: e.clientY };
   if (state.mode === "pilot") { state.drag = { x: e.clientX, y: e.clientY }; cv.setPointerCapture && cv.setPointerCapture(e.pointerId); }
 });
@@ -800,6 +951,7 @@ cv.addEventListener("pointerup", (e) => {
 cv.addEventListener("pointercancel", endDrag);
 const parallax = { x: 0, y: 0 };
 window.addEventListener("keydown", (e) => {
+  if (state.intro) endIntro();
   if (e.key === "Escape") {
     if (!ui.manifest.hidden) { closeManifest(); return; }
     if (state.mode !== "overview") goHome();
@@ -864,11 +1016,23 @@ function updateLabels() {
 
 function tick() {
   const dt = Math.min(0.05, clock.getDelta()); time += dt;
+  let warpTarget = 0, warpTint = null;
   // ambient motion
   for (const o of worldObjs) {
     o.planet.rotation.y += dt * o.spin;
-    o.pylons.rotation.z += dt * (0.25 + o.w.i * 0.02) * (o.w.i % 2 ? 1 : -1);
+    if (o.clouds) o.clouds.rotation.y += dt * o.spin * 1.7;
+    const hot = state.mode === "overview" && !state.intro && o.w.i === hover ? 1 : 0;
+    o.hk += (hot - o.hk) * (1 - Math.exp(-dt * 8));
+    o.pylons.rotation.z += dt * (0.25 + o.w.i * 0.02 + 1.8 * o.hk) * (o.w.i % 2 ? 1 : -1);
     o.film.material.uniforms.t.value = time;
+    o.film.material.uniforms.a.value = 1 + 0.9 * o.hk + o.surge;
+    o.halo.material.opacity = .38 + .45 * o.hk;
+    o.gate.scale.setScalar(1 + .07 * o.hk);
+    if (o.pulse.t >= 0) {
+      o.pulse.t += dt / 1.3; const t = o.pulse.t;
+      o.pulse.m.scale.setScalar(1 + t * 1.8); o.pulse.m.material.opacity = Math.max(0, 1 - t) * .9;
+      if (t >= 1) { o.pulse.t = -1; o.pulse.m.visible = false; }
+    }
     o.grp.position.y += Math.sin(time * 0.6 + o.w.i) * dt * 0.12;
   }
   stars.rotation.y += dt * 0.004;
@@ -879,7 +1043,17 @@ function tick() {
   let fov = pose.fov;
   if (state.mode === "overview") {
     const sway = reduceMotion ? 0 : 1;
-    camera.position.set(pose.overPos.x + parallax.x * 1.6 * sway + Math.sin(time * .3) * .35 * sway, pose.overPos.y - parallax.y * 0.8 * sway + Math.sin(time * .41) * .2 * sway, pose.overPos.z);
+    let ic = 0;
+    if (state.intro) {
+      const it = state.intro; it.t += dt; const T = it.t;
+      hangarLights.forEach(([l, v], j) => { l.intensity = v * smooth(0.2 + j * 0.35, 0.9 + j * 0.35, T) * (T < 1.3 ? 0.7 + 0.3 * Math.sin(T * 40 + j * 2) : 1); });
+      ambient.intensity = 0.12 + 0.3 * smooth(0.1, 1.4, T);
+      seamMat.color.setHex(0xffb020).multiplyScalar(T < 1.2 ? (Math.sin(T * 22) > 0 ? 1.5 : 0.25) : 1);
+      setDoors(ease(smooth(1.1, 3.0, T)));
+      ic = 1 - ease(smooth(0, 3.3, T));
+      if (T > 3.4) endIntro();
+    }
+    camera.position.set(pose.overPos.x + parallax.x * 1.6 * sway + Math.sin(time * .3) * .35 * sway, pose.overPos.y - ic * 1.2 - parallax.y * 0.8 * sway + Math.sin(time * .41) * .2 * sway, pose.overPos.z - ic * 7);
     lookCur.lerp(pose.overLook, 1 - Math.exp(-dt * 6));
     camera.lookAt(lookCur);
     ship.position.y = pose.dock.y + Math.sin(time * 1.3) * 0.06;
@@ -887,6 +1061,14 @@ function tick() {
     const f = state.flight; f.t += dt / f.dur;
     const u = ease(Math.min(1, f.t));
     f.curve.getPointAt(u, camera.position);
+    if (!reduceMotion) {
+      if (f.fromOverview) {
+        warpTarget = smooth(0.32, 0.5, u) * (1 - smooth(0.78, 0.96, u));
+        const sh = smooth(0.03, 0.1, u) * (1 - smooth(0.26, 0.36, u)) * 0.07 + warp.k * 0.025;
+        camera.position.x += (Math.random() - .5) * sh; camera.position.y += (Math.random() - .5) * sh;
+      } else warpTarget = Math.sin(Math.PI * u) * (f.home ? 0.55 : 0.8);
+      if (!f.home) warpTint = worldObjs[f.i].col;
+    }
     f.curve.getPointAt(Math.min(1, u + 0.035), tmp);
     const endLook = f.home ? pose.overLook : f.end.look;
     tmp.lerp(endLook, smooth(0.62, 1, u));
@@ -905,7 +1087,7 @@ function tick() {
     if (f.t >= 1) {
       stars.material.size = 1.6;
       if (f.home) { state.mode = "overview"; setMode("overview"); dockShip(); }
-      else { state.mode = "arrived"; setMode("arrived"); if (!f.screenShown) showScreen(WORLDS[f.i]); }
+      else { state.mode = "arrived"; setMode("arrived"); if (!f.screenShown) showScreen(WORLDS[f.i]); pulseWorld(f.i); }
       state.flight = null;
     }
   } else if (state.mode === "arrived") {
@@ -916,7 +1098,9 @@ function tick() {
       tmp.copy(p.pos).lerp(gatePoint(state.current), k * 0.85);
       camera.position.lerp(tmp, 1 - Math.exp(-dt * 8));
       fov = pose.fov + 26 * k;
-      if (state.plunge.t >= 1) state.plunge = null;
+      const po = worldObjs[state.current]; po.surge = 2.2 * k;
+      if (!reduceMotion) { warpTarget = k; warpTint = po.col; }
+      if (state.plunge.t >= 1) { state.plunge = null; po.surge = 0; }
     } else {
       tmp.copy(p.pos); if (!reduceMotion) { tmp.y += Math.sin(time * .8) * .25; tmp.x += Math.sin(time * .5) * .3; }
       camera.position.lerp(tmp, 1 - Math.exp(-dt * 3));
@@ -924,7 +1108,11 @@ function tick() {
     lookCur.lerp(p.look, 1 - Math.exp(-dt * 4)); camera.lookAt(lookCur);
   } else if (state.mode === "pilot") {
     pilotStep(dt);
+    if (!reduceMotion && state.keys["shift"]) warpTarget = 0.3;
   }
+  updateWarp(dt, warpTarget, warpTint);
+  updateTraffic(reduceMotion ? 0 : dt);
+  if (!reduceMotion) updateDust(dt);
   if (Math.abs(camera.fov - fov) > 0.01) { camera.fov += (fov - camera.fov) * (1 - Math.exp(-dt * 10)); camera.updateProjectionMatrix(); }
   updateLabels();
   renderer.render(scene, camera);
@@ -976,6 +1164,7 @@ window.addEventListener("resize", () => { if (state.mode !== "flying" && state.m
 layout();
 camera.position.copy(pose.overPos); lookCur.copy(pose.overLook); camera.lookAt(lookCur); dockShip();
 setMode("overview");
+if (!reduceMotion && !location.hash) startIntro(); else setDoors(1);
 routeFromHash(true);
 renderer.setAnimationLoop(tick);
 })();
