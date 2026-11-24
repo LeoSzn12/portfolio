@@ -1,5 +1,7 @@
-# Ankit Patel's Hangar
+# Ankit Patel's Island Lab
 
-A 3D space-hangar portfolio. Each app is a world: fly to it, read the cockpit summary, and go through the portal to the live site.
+A floating-island portfolio. Each app is a workshop: tap a building (or pick it from the harbor board) to read its card and visit the live site. The rest of the island is for play: skip stones, light the lighthouse, plant glowing flowers, switch day and night, find six secrets.
 
-One static file (`index.html`), Three.js from cdnjs. Served with GitHub Pages.
+One static file (`index.html`), no build step. Served with GitHub Pages at ankitpatel.si.
+
+The previous 3D space hangar lives on at `/hangar/` (including its `#tour` mode).
