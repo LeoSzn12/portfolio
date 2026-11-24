@@ -133,14 +133,6 @@ a { color: inherit; }
   .masthead.open .intro { display: block; }
   .masthead.open .icon-btn { background: var(--ink); color: #1a1530; }
   .masthead .intro p { text-shadow: none; }
-  /* the island gets the whole screen: the harbor board becomes the Projects sheet */
-  .board { display: none !important; }
-  .dock { flex-direction: row; gap: 6px; bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); }
-  .dock-btn { width: 40px; height: 40px; background: rgba(10, 16, 40, .62); }
-  .dock-btn svg { width: 19px; height: 19px; }
-  .finds { bottom: calc(env(safe-area-inset-bottom, 0px) + 62px); }
-  .hint { bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); }
-  .toast { top: auto; bottom: calc(env(safe-area-inset-bottom, 0px) + 64px); font-size: 12.5px; padding: 6px 12px; }
 }
 /* hint + toast */
 .hint, .toast {
@@ -334,6 +326,16 @@ a { color: inherit; }
 .spark { animation: spark .9s ease-out infinite; }
 @keyframes spark { 0% { opacity: 1 } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) } }
 
+@media (max-width: 899px) {
+  /* the island gets the whole screen: the harbor board becomes the Projects sheet */
+  .board { display: none !important; }
+  .dock { flex-direction: row; gap: 6px; bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); }
+  .dock-btn { width: 40px; height: 40px; background: rgba(10, 16, 40, .62); }
+  .dock-btn svg { width: 19px; height: 19px; }
+  .finds { bottom: calc(env(safe-area-inset-bottom, 0px) + 62px); }
+  .hint { bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); }
+  .toast { top: auto; bottom: calc(env(safe-area-inset-bottom, 0px) + 64px); font-size: 12.5px; padding: 6px 12px; }
+}
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
