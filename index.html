@@ -1176,8 +1176,20 @@ window.addEventListener("resize", () => { if (state.mode !== "flying" && state.m
 layout();
 camera.position.copy(pose.overPos); lookCur.copy(pose.overLook); camera.lookAt(lookCur); dockShip();
 setMode("overview");
-if (!reduceMotion && !location.hash) startIntro(); else setDoors(1);
-routeFromHash(true);
+const touring = location.hash === "#tour";
+if (!reduceMotion && (!location.hash || touring)) startIntro(); else setDoors(1);
+if (touring) {
+  /* Self-running tour for screen recordings: every world in order, then home */
+  setHash(""); let stop = false, k = 0;
+  const halt = () => { stop = true; };
+  window.addEventListener("pointerdown", halt, { once: true }); window.addEventListener("keydown", halt, { once: true });
+  const next = () => {
+    if (stop) return;
+    if (k < WORLDS.length) { flyTo(k++); setTimeout(next, 7000); }
+    else goHome();
+  };
+  setTimeout(next, reduceMotion ? 1000 : 4600);
+} else routeFromHash(true);
 renderer.setAnimationLoop(tick);
 })();
 </script>
