@@ -180,12 +180,14 @@ body.nogl .gl-only { display: none !important; }
 #hud, #labels { transition: opacity .9s ease; }
 body.intro #hud, body.intro #labels { opacity: 0; }
 body.intro #hud *, body.intro #labels * { pointer-events: none !important; }
+.card-log { font-size: 13px !important; color: var(--muted) !important; }
+.card-log b { font-family: var(--mono); font-weight: 500; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--c); margin-right: 6px; }
 </style>
 </head>
 <body>
 
 <div id="app">
-  <canvas id="scene" aria-label="A space hangar with doors open onto eight worlds, one for each project"></canvas>
+  <canvas id="scene" aria-label="A space hangar with doors open onto nine worlds, one for each project and one for my toolbox"></canvas>
   <div id="labels"></div>
 
   <svg id="canopy" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
@@ -216,7 +218,7 @@ body.intro #hud *, body.intro #labels * { pointer-events: none !important; }
   <div id="hud">
     <div class="topbar">
       <div class="brand" id="brand">
-        <span class="eyebrow">Hangar open · 8 worlds docked</span>
+        <span class="eyebrow">Hangar open · 9 worlds docked</span>
         <h1>Ankit Patel</h1>
         <p>I build apps and AI tools. Each world outside these doors is one of them. Tap a world to fly there.</p>
         <div class="row">
@@ -272,14 +274,14 @@ const WORLDS = [
            "Find books by trope or mood, and build a shelf with your Top 5 and half-star reviews"],
     tags: ["iPhone app", "Web"], standout: ["Standout", "Character chat: talk with the cast of a book."],
     links: [["Enter portal", "https://immersebooks.com", "primary"], ["App Store", "https://apps.apple.com/app/id6761164604"]] },
-  { id: "blink-stop", name: "Blink Stop", color: "#ff4d6d", kind: "bands", status: ["Live", "live"],
+  { id: "blink-stop", log: "Paired with Claude Code from the first commit to the App Store, including the iOS build and release pipeline.", name: "Blink Stop", color: "#ff4d6d", kind: "bands", status: ["Live", "live"],
     pitch: "A staring contest against your phone's camera. Blink and you lose, so the whole family plays.",
     scan: ["Classic, Precision, Endurance and Daily modes, plus Balloon Pop",
            "Face tracking runs on the device, and scores stay on it",
            "Family scoreboard, holiday skins and shareable result cards"],
     tags: ["JavaScript", "MediaPipe", "Capacitor", "iOS", "Vercel"], standout: ["AI inside", "An on-device face-landmark model catches every blink in real time."],
     links: [["Enter portal", "https://www.playblinkstop.com", "primary"], ["App Store", "https://apps.apple.com/us/app/blink-stop/id6822026817"], ["Code", "https://github.com/LeoSzn12/blink-stop"]] },
-  { id: "first-week", name: "First Week", color: "#ffc83f", kind: "continents", status: ["In development", "dev"],
+  { id: "first-week", log: "Started July 2026 and built with Claude Code, working from one AGENTS.md rulebook.", name: "First Week", color: "#ffc83f", kind: "continents", status: ["In development", "dev"],
     pitch: "Draft an album against a rival, drop it, and see how it sells in its first week.",
     scan: ["Pick a lane: Hip-Hop, R&B, Country, EDM, Bollywood or a decade",
            "A rival with a personality, rule cards and a blind Snippet Round",
@@ -293,27 +295,35 @@ const WORLDS = [
            "A sandbox and a build-your-own-city mode"],
     tags: ["JavaScript", "Mobile web", "iOS"], standout: null,
     links: [], sealed: "Portal opens at launch" },
-  { id: "routine", name: "Routine", color: "#4ef09a", kind: "continents", status: ["In development", "dev"],
+  { id: "routine", log: "Started November 2026 and built with Claude Code, for Cloudflare.", name: "Routine", color: "#4ef09a", kind: "continents", status: ["In development", "dev"],
     pitch: "A daily habit coach that scores your day, keeps your streaks and nudges you at the right time.",
     scan: ["A score for every day, streaks and 28-day patterns",
            "Coaching tips grounded in habit research",
            "Phone reminders, works offline, its own sign-in"],
     tags: ["Cloudflare Workers", "D1", "Drizzle", "MCP", "Web Push"], standout: ["AI inside", "Agent tools (MCP) let an AI assistant check you in and plan your day."],
     links: [], sealed: "Portal opens at launch" },
-  { id: "eios", name: "EIOS", full: "Executive Intelligence OS", color: "#e6e9ff", kind: "bands", status: ["In development", "dev"],
+  { id: "eios", log: "Built July to October 2026 with Claude Code. The council also ships as a Claude Code plugin you can consult while you work.", name: "EIOS", full: "Executive Intelligence OS", color: "#e6e9ff", kind: "bands", status: ["In development", "dev"],
     pitch: "Founders ask a business question, and a council of 52 AI advisors answers with sources and a first move.",
     scan: ["The right advisors are picked as you type, and each one cites its sources inline",
            "Second opinions, one-page briefs and a scoreboard of open experiments",
            "Built-in tools for unit economics, growth and cash runway"],
     tags: ["TypeScript", "Turborepo", "Claude API"], standout: ["AI inside", "A multi-model advisor council, with Claude as a provider, grounded in cited passages."],
     links: [], sealed: "Portal opens at launch" },
-  { id: "kinvest", name: "KinVest", color: "#ff9a6b", kind: "swirl", status: ["Pre-launch", "pre"],
+  { id: "kinvest", log: "Started January 2026. Claude Code, Gemini and Abacus DeepAgent all build from one shared charter that keeps money handling honest.", name: "KinVest", color: "#ff9a6b", kind: "swirl", status: ["Pre-launch", "pre"],
     pitch: "Gift pages for kids, where family give toward a child's future and leave messages they'll keep.",
     scan: ["Private child pages, goals and invite links for trusted family",
            "Gifts go through approved providers, so KinVest never holds the money",
            "A memory library and a yearly Yearbook Wrapped"],
     tags: ["Next.js", "TypeScript", "Resend"], standout: null,
     links: [], sealed: "Portal opens at launch" },
+  { id: "toolbox", name: "The Toolbox", short: "Toolbox", color: "#ff7ad9", kind: "bands", status: ["Always growing", "dev"],
+    pitch: "The models, agents and tools I keep reaching for, and what I use each one for. New ones get tried the week they drop.",
+    scan: ["Agents that write code with me: Claude Code, Codex, Gemini, Antigravity and Abacus DeepAgent",
+           "Models inside my apps: Gemini narration in First Week, on-device face tracking with MediaPipe in Blink Stop, ElevenLabs voices in Confessions",
+           "Video and launch content: Google Flow, Remotion and FFmpeg",
+           "Shipping: GitHub Actions, Vercel, Cloudflare and Capacitor for iOS"],
+    tags: [], standout: ["How I work", "I give agents a written charter or rulebook, then review and ship what they build."],
+    links: [] },
   { id: "about", name: "About Ankit", short: "About", color: "#b98bff", kind: "craters", status: ["Pilot", "pre"],
     pitch: "I'm not a software engineer. I'm a builder, a tinkerer who can't leave a new model, tool or harness alone. When something new drops, I'm in it that night, poking at it to see how far it'll go. Sometimes it breaks. Sometimes it turns into an app: Immerse and Blink Stop are live on the App Store, and five more are in the hangar. I love every minute of it.",
     scan: ["Shipped: Immerse and Blink Stop, both live on the web and the App Store",
@@ -346,8 +356,9 @@ function screenHTML(w) {
     <h2 class="scr-name">${esc(w.name)}</h2>
     <p class="scr-pitch">${esc(w.pitch)}</p>
     <ul class="scan">${w.scan.map((s) => `<li>${esc(s)}</li>`).join("")}</ul>
-    ${(w.tags.length || w.standout) ? `<div class="meta">
+    ${(w.tags.length || w.standout || w.log) ? `<div class="meta">
       ${w.standout ? `<div class="meta-row"><span class="meta-k">${esc(w.standout[0])}</span><span class="meta-v">${esc(w.standout[1])}</span></div>` : ""}
+      ${w.log ? `<div class="meta-row"><span class="meta-k">Build log</span><span class="meta-v">${esc(w.log)}</span></div>` : ""}
       ${w.tags.length ? `<div class="meta-row"><span class="meta-k">Built with</span><span class="meta-v chips">${w.tags.map((t) => `<span class="chip">${esc(t)}</span>`).join("")}</span></div>` : ""}
     </div>` : ""}
     <div class="scr-actions">${linkBtns(w)}</div>
@@ -365,6 +376,7 @@ function cardHTML(w, fly) {
     </div>
     <h3>${esc(w.name)}</h3>
     <p>${esc(w.pitch)}</p>
+    ${w.log ? `<p class="card-log"><b>Build log</b> ${esc(w.log)}</p>` : ""}
     ${w.tags.length ? `<div class="chips">${w.tags.map((t) => `<span class="chip">${esc(t)}</span>`).join("")}</div>` : ""}
     <div class="scr-actions">
       ${fly ? `<button class="btn gl-only" type="button" data-fly="${w.i}">Fly there</button>` : ""}
@@ -703,7 +715,7 @@ const pickables = [];
 WORLDS.forEach((w) => {
   const grp = new THREE.Group();
   const col = new THREE.Color(w.color);
-  const R = w.id === "about" ? 2.6 : 3.2;
+  const R = (w.id === "about" || w.id === "toolbox") ? 2.6 : 3.2;
   const planet = new THREE.Mesh(new THREE.SphereGeometry(R, 48, 32), new THREE.MeshStandardMaterial({ map: planetTexture(w), roughness: .95, metalness: 0 }));
   planet.rotation.z = (w.i % 3 - 1) * 0.25; grp.add(planet);
   const atmo = new THREE.Mesh(new THREE.SphereGeometry(R * 1.12, 40, 24), new THREE.ShaderMaterial({ vertexShader: atmoVS, fragmentShader: atmoFS, uniforms: { c: { value: col } }, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false }));
@@ -833,11 +845,11 @@ function layout() {
   renderer.setSize(w, h, false); camera.aspect = a;
   const portrait = a < 0.95; pose.portrait = portrait;
   if (portrait) {
-    worldObjs.forEach((o, i) => { const col = i % 2, row = i / 2 | 0; o.grp.position.set(col ? 8.6 : -8.6, 18 - row * 9.4, -46 - (col ? 2 : 0)); });
+    worldObjs.forEach((o, i) => { const col = i % 3, row = i / 3 | 0; o.grp.position.set((col - 1) * 10.6, 15 - row * 11 - (col === 1 ? 2.2 : 0), -46 - (col === 1 ? 2 : 0)); o.grp.scale.setScalar(0.82); });
     pose.overPos.set(0, 6, 8); pose.overLook.set(0, 8, -46); pose.dock.set(0, -1.7, -9);
     pose.fov = Math.max(60, 2 * Math.atan(0.29 / a) * 180 / Math.PI);
   } else {
-    worldObjs.forEach((o, i) => { const row = i < 4 ? 0 : 1, col = i % 4; o.grp.position.set((col - 1.5) * 21 + (row ? 4 : -4), row ? -1 : 13.5, -64 - Math.abs(col - 1.5) * 4 - row * 3); });
+    worldObjs.forEach((o, i) => { const row = i < 5 ? 0 : 1, col = row ? i - 5 : i, c = row ? col - 1.5 : col - 2; o.grp.position.set(c * 16.4, row ? -2.6 : 14.6, -64 - Math.abs(c) * 3 - row * 3); o.grp.scale.setScalar(1); });
     pose.overPos.set(0, 3, 26); pose.overLook.set(0, 6.5, -62); pose.dock.set(0, -2.4, 8);
     pose.fov = Math.max(52, 2 * Math.atan(0.5 / a) * 180 / Math.PI);
   }
