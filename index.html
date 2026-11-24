@@ -9,8 +9,8 @@
 <meta property="og:description" content="Apps and AI tools by Ankit Patel, one workshop each on a floating island. Tap a building, or skip a stone in the pond.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://ankitpatel.si/">
-<meta name="theme-color" content="#0b1238">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cellipse cx='32' cy='26' rx='26' ry='11' fill='%235fd0a2'/%3E%3Cpath d='M6 27 L58 27 L36 58 Z' fill='%233a2f7c'/%3E%3Ccircle cx='32' cy='18' r='5' fill='%23ffcf6b'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#2a6fd6">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cellipse cx='32' cy='26' rx='26' ry='11' fill='%239ee374'/%3E%3Cpath d='M6 27 L58 27 L36 58 Z' fill='%23c98a4b'/%3E%3Ccircle cx='32' cy='18' r='5' fill='%23ffcf6b'/%3E%3C/svg%3E">
 <style>body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,10 +19,11 @@
 <style>
 /* Layout: phone-first. A full-screen island you drag and pinch, the masthead over the sky, a play dock at the right thumb, and the harbor board pinned along the bottom (right column on wide screens). Sky follows a day, dusk or night dial. */
 :root {
-  --sky-top: #0b1238; --sky-mid: #253a8a; --sky-low: #d9789a; --sky-horizon: #f4bf86;
-  --grass-1: #5fd0a2; --grass-2: #2f9a7c; --grass-hi: #7ee0b6;
-  --cliff-1: #6b5aa8; --cliff-2: #2a2160; --rock-1: #3a2f7c; --rock-2: #140f3a;
-  --wall-l: #e9ecfa; --wall-r: #a9b2d8; --roof: #f6f7ff;
+  --sky-top: #2b3f8f; --sky-mid: #7d7bd0; --sky-low: #f49ab0; --sky-horizon: #ffd29a;
+  --grass-1: #8ed06c; --grass-2: #3f9a58; --grass-hi: #a8e08a;
+  --cliff-1: #d39a62; --cliff-2: #9a5f39; --rock-1: #a86b44; --rock-2: #5e3622;
+  --sea-1: #34407e; --sea-2: #e38fa6; --cloud: #ffe9f0; --cloud-sh: #c79ac9; --sand: #f1d39a;
+  --wall-1: #fff6f2; --wall-2: #e6cfe0;
   --stars: .9; --sun: 1; --moon: 0; --flies: .55;
   --ink: #f3f5ff; --ink-dim: #b8c0e6;
   --panel: #0e1530; --panel-2: #162046; --line: #2b3769;
@@ -35,17 +36,19 @@
   color-scheme: dark;
 }
 .scene[data-time="day"] {
-  --sky-top: #3f8fe0; --sky-mid: #79bff5; --sky-low: #c6e8ff; --sky-horizon: #fff0d0;
-  --grass-1: #74e0ae; --grass-2: #3cb886; --grass-hi: #a6f0cb;
-  --cliff-1: #8d7fd0; --cliff-2: #4a3d93; --rock-1: #5a4cae; --rock-2: #2a2070;
-  --wall-l: #ffffff; --wall-r: #c4cbe8; --roof: #ffffff;
+  --sky-top: #2a6fd6; --sky-mid: #4d9be8; --sky-low: #9fd3f7; --sky-horizon: #dff3ff;
+  --grass-1: #9ee374; --grass-2: #4fb455; --grass-hi: #c1f09a;
+  --cliff-1: #e2b06e; --cliff-2: #b97a43; --rock-1: #c98a4b; --rock-2: #7d4b2b;
+  --sea-1: #1f63c4; --sea-2: #5fb2f0; --cloud: #ffffff; --cloud-sh: #c3d9f2; --sand: #f6dfa4;
+  --wall-1: #ffffff; --wall-2: #d7e1f2;
   --stars: 0; --sun: 1; --moon: 0; --flies: 0;
 }
 .scene[data-time="night"] {
-  --sky-top: #03051a; --sky-mid: #0b1446; --sky-low: #1f2468; --sky-horizon: #3a2d73;
-  --grass-1: #2f7f6c; --grass-2: #1a4f4a; --grass-hi: #3d8f7b;
-  --cliff-1: #3d3478; --cliff-2: #161240; --rock-1: #221b55; --rock-2: #0a0824;
-  --wall-l: #8f97c4; --wall-r: #5d6596; --roof: #a7aed6;
+  --sky-top: #070b2a; --sky-mid: #18245e; --sky-low: #2c3a82; --sky-horizon: #3a4d9a;
+  --grass-1: #4f9468; --grass-2: #24513f; --grass-hi: #5fa676;
+  --cliff-1: #8a6450; --cliff-2: #4a3127; --rock-1: #5a3a2c; --rock-2: #2a1a14;
+  --sea-1: #0b1a4a; --sea-2: #1f3d80; --cloud: #5f6aa6; --cloud-sh: #3f4880; --sand: #b3a07c;
+  --wall-1: #c7cde8; --wall-2: #8d95c0;
   --stars: 1; --sun: 0; --moon: 1; --flies: 1;
 }
 html, body { height: 100%; }
@@ -68,12 +71,20 @@ a { color: inherit; }
 }
 .scene svg.world { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; }
 .scene svg.world.dragging { cursor: grabbing; }
-@media (max-width: 899px) { .scene svg.world { height: calc(100% - var(--mboard-h, 200px) + 18px); } }
+
 .g-stop-1 { stop-color: var(--grass-1); } .g-stop-2 { stop-color: var(--grass-2); }
 .c-stop-1 { stop-color: var(--cliff-1); } .c-stop-2 { stop-color: var(--cliff-2); }
 .r-stop-1 { stop-color: var(--rock-1); } .r-stop-2 { stop-color: var(--rock-2); }
 .grass-hi { fill: var(--grass-hi); }
-.wall-l { fill: var(--wall-l); } .wall-r { fill: var(--wall-r); } .roof { fill: var(--roof); }
+.w1 { fill: var(--wall-1); } .w2 { fill: var(--wall-2); }
+.s-stop-1 { stop-color: var(--sea-1); } .s-stop-2 { stop-color: var(--sea-2); }
+.cloud-c { fill: var(--cloud); } .cloud-sh { fill: var(--cloud-sh); }
+.sea-line { fill: var(--sky-horizon); opacity: .8; }
+.far-land { fill: var(--cliff-2); opacity: .55; }
+.foam { stroke: #ffffff; opacity: .55; }
+.walk { stroke: var(--sand); } .walk-f { fill: var(--sand); }
+.float { animation: bob 5s ease-in-out infinite; }
+@keyframes bob { 50% { transform: translateY(-6px); } }
 .stars { opacity: var(--stars); transition: opacity 1s; }
 .sun { opacity: var(--sun); transition: opacity 1s; }
 .moon { opacity: var(--moon); transition: opacity 1s; }
@@ -91,8 +102,46 @@ a { color: inherit; }
 }
 .masthead .eyebrow { font-family: var(--font-mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--amber); }
 .masthead h1 { font-family: var(--font-display); font-weight: 800; font-size: clamp(24px, 5vw, 44px); line-height: 1.04; margin: 4px 0 6px; letter-spacing: -0.02em; text-wrap: balance; text-shadow: 0 2px 18px rgba(5, 8, 30, .5); }
+.masthead p.role { margin-top: 8px; font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .04em; color: var(--amber); opacity: 1; }
+.masthead .cta { pointer-events: auto; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.masthead .intro { pointer-events: auto; margin-top: 6px; }
+.masthead .cta a, .masthead .cta button { min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); background: rgba(10, 16, 40, .78); color: var(--ink); font: 600 13px var(--font-body, inherit); display: inline-flex; align-items: center; text-decoration: none; cursor: pointer; }
+.masthead .cta .cta-main { background: var(--amber); border-color: var(--amber); color: #1a1530; }
+@media (max-width: 899px) { .masthead .lead-more { display: none; } .masthead p { max-width: none; font-size: 13px; } .masthead h1 { margin-bottom: 4px; } }
 .masthead p { margin: 0; max-width: 44ch; color: var(--ink); opacity: .85; font-size: 13.5px; line-height: 1.4; text-shadow: 0 1px 10px rgba(5, 8, 30, .6); }
 
+.masthead::before { content: ""; position: absolute; inset: 0 0 -36px 0; z-index: -1; pointer-events: none; background: linear-gradient(180deg, rgba(8, 20, 70, .6), rgba(8, 20, 70, .3) 65%, rgba(8, 20, 70, 0)); }
+.masthead .eyebrow, .masthead p.role { text-shadow: 0 1px 8px rgba(5, 8, 30, .7); }
+
+/* top bar: name, one line, Projects and an info button; the full intro is one tap away on phones */
+.masthead .bar { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.masthead .who { min-width: 0; }
+.masthead .bar-btns { pointer-events: auto; display: flex; gap: 6px; flex: none; }
+.masthead .bar-btns button { min-height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: rgba(10, 16, 40, .78); color: var(--ink); font: 700 13px var(--font-body, inherit); cursor: pointer; }
+.masthead .bar-btns .cta-main { background: var(--amber); border-color: var(--amber); color: #1a1530; }
+.masthead .icon-btn { width: 36px; padding: 0 !important; display: inline-grid; place-items: center; }
+.masthead .icon-btn svg { width: 20px; height: 20px; }
+@media (min-width: 900px) { .masthead .icon-btn { display: none; } }
+@media (max-width: 899px) {
+  .masthead { padding-top: calc(env(safe-area-inset-top, 0px) + 10px); padding-bottom: 10px; background: none; }
+  .masthead::before { inset: 0 0 -24px 0; background: linear-gradient(180deg, rgba(8, 20, 70, .55), rgba(8, 20, 70, .25) 70%, rgba(8, 20, 70, 0)); transition: opacity .4s; }
+  .masthead .eb-more { display: none; }
+  .masthead h1 { font-size: 16px; line-height: 1.2; margin: 2px 0 0; max-height: 3em; overflow: hidden; transition: max-height .35s ease, opacity .3s, margin .35s; }
+  .played .masthead h1 { max-height: 0; opacity: 0; margin: 0; }
+  .played .masthead::before { opacity: .45; }
+  .masthead .intro { pointer-events: auto; display: none; margin-top: 10px; background: rgba(10, 16, 40, .94); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; box-shadow: 0 18px 40px rgba(0, 0, 0, .4); }
+  .masthead.open .intro { display: block; }
+  .masthead.open .icon-btn { background: var(--ink); color: #1a1530; }
+  .masthead .intro p { text-shadow: none; }
+  /* the island gets the whole screen: the harbor board becomes the Projects sheet */
+  .board { display: none !important; }
+  .dock { flex-direction: row; gap: 6px; bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); }
+  .dock-btn { width: 40px; height: 40px; background: rgba(10, 16, 40, .62); }
+  .dock-btn svg { width: 19px; height: 19px; }
+  .finds { bottom: calc(env(safe-area-inset-bottom, 0px) + 62px); }
+  .hint { bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); }
+  .toast { top: auto; bottom: calc(env(safe-area-inset-bottom, 0px) + 64px); font-size: 12.5px; padding: 6px 12px; }
+}
 /* hint + toast */
 .hint, .toast {
   position: absolute; z-index: 5; left: 50%; transform: translateX(-50%);
@@ -148,7 +197,8 @@ a { color: inherit; }
 @keyframes tw { 0%,100% { opacity: .25 } 50% { opacity: 1 } }
 .fall { stroke-dasharray: 10 14; animation: fall 1.1s linear infinite; }
 @keyframes fall { to { stroke-dashoffset: -24 } }
-.cloud { animation: drift 80s linear infinite; }
+.cloud { animation: drift 160s linear infinite; } .cloud.slow { animation: drift2 30s ease-in-out infinite alternate; }
+@keyframes drift2 { from { transform: translateX(0); } to { transform: translateX(120px); } }
 @keyframes drift { from { transform: translateX(-200px) } to { transform: translateX(1300px) } }
 .ring-pulse { animation: rp 3s ease-in-out infinite; }
 @keyframes rp { 0%,100% { opacity: .3 } 50% { opacity: .75 } }
@@ -170,6 +220,7 @@ a { color: inherit; }
 .board-head { padding: 18px 18px 12px; border-bottom: 1px solid var(--line); display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 .board-head .title { font-family: var(--font-mono); font-weight: 700; letter-spacing: .14em; text-transform: uppercase; font-size: 12px; color: var(--amber); }
 .board-head .sub { font-family: var(--font-mono); font-size: 11px; color: var(--ink-dim); }
+.board-head .as-list { background: none; border: 1px solid var(--line); border-radius: 999px; padding: 0 12px; min-height: 32px; cursor: pointer; color: var(--ink); letter-spacing: .06em; text-transform: uppercase; }
 .board-list { list-style: none; margin: 0; padding: 6px 8px 16px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 2px; }
 .row { width: 100%; text-align: left; background: transparent; border: 0; border-radius: 10px; cursor: pointer; display: grid; grid-template-columns: 34px 1fr auto; gap: 4px 10px; align-items: center; padding: 10px; }
 .row:hover, .row.is-hot { background: var(--panel-2); }
@@ -193,6 +244,38 @@ a { color: inherit; }
   .row .nm span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .row .pill { font-size: 9.5px; }
 }
+
+/* ---------- Projects list (plain) ---------- */
+.plist {
+  position: fixed; z-index: 21; left: 50%; top: 50%; transform: translate(-50%, -46%); opacity: 0;
+  width: min(720px, calc(100% - 32px)); max-height: calc(100% - 48px);
+  background: var(--panel); border: 1px solid var(--line); border-radius: 22px; overflow: hidden; display: flex; flex-direction: column;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .5); transition: transform .3s cubic-bezier(.2,.8,.2,1), opacity .25s;
+}
+.plist.open { transform: translate(-50%, -50%); opacity: 1; }
+@media (max-width: 899px) {
+  .plist { left: 0; right: 0; top: auto; bottom: 0; width: 100%; max-height: 94%; border-radius: 22px 22px 0 0; transform: translateY(40px); }
+  .plist.open { transform: translateY(0); }
+}
+.plist-head { flex: none; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 16px max(20px, env(safe-area-inset-right, 0px)) 12px max(20px, env(safe-area-inset-left, 0px)); border-bottom: 1px solid var(--line); }
+.plist-head h2 { font-family: var(--font-display); font-weight: 800; font-size: 26px; margin: 0; letter-spacing: -0.02em; }
+.plist-head .role { margin: 4px 0 0; font-family: var(--font-mono); font-size: 11.5px; color: var(--amber); }
+.plist-head .shop-x { position: static; flex: none; }
+.plist-body { overflow-y: auto; overscroll-behavior: contain; padding: 12px max(20px, env(safe-area-inset-right, 0px)) calc(18px + env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left, 0px)); display: flex; flex-direction: column; gap: 12px; }
+.pcard { border: 1px solid var(--line); border-left: 3px solid var(--c); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; background: color-mix(in srgb, var(--c) 4%, transparent); }
+.pcard .top { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.pcard h3 { margin: 0; font-family: var(--font-display); font-size: 18px; display: flex; align-items: center; gap: 8px; }
+.pcard h3 .ic { color: var(--c); display: inline-flex; }
+.pcard p { margin: 0; font-size: 14px; line-height: 1.45; }
+.pcard .k { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-dim); margin-right: 6px; }
+.pcard .acts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.pcard .acts a, .pcard .acts button, .pcard .acts span { min-height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel-2); font-size: 13.5px; font-weight: 600; display: inline-flex; align-items: center; text-decoration: none; cursor: pointer; }
+.pcard .acts a.primary { background: var(--c); border-color: var(--c); color: #0a1026; }
+.pcard .acts span { border-style: dashed; background: none; color: var(--ink-dim); font-family: var(--font-mono); font-size: 12px; font-weight: 400; cursor: default; }
+.pcard .acts button { background: none; color: var(--ink-dim); font-weight: 500; }
+.plist .contact { display: flex; flex-wrap: wrap; gap: 6px; }
+.plist .contact a, .plist .contact span { min-height: 40px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); font-size: 13.5px; font-weight: 600; display: inline-flex; align-items: center; text-decoration: none; }
+.plist .contact span { border-style: dashed; color: var(--ink-dim); font-weight: 400; }
 
 /* ---------- Workshop (detail) ---------- */
 .shop-backdrop { position: fixed; inset: 0; z-index: 20; background: rgba(6, 9, 28, .55); opacity: 0; transition: opacity .25s; }
@@ -226,6 +309,15 @@ a { color: inherit; }
 .callout { border: 1px solid color-mix(in srgb, var(--c) 45%, var(--line)); background: color-mix(in srgb, var(--c) 9%, transparent); border-radius: 14px; padding: 12px 14px; }
 .callout .sect-k { color: var(--c); margin-bottom: 2px; }
 .log { font-size: 13.5px; color: var(--ink-dim); margin: 0; }
+.agents { border-top: 1px solid var(--line); padding-top: 12px; }
+.agents .scan li { font-size: 14px; }
+.agents .unv { margin: 8px 0 0; font-size: 13px; color: var(--ink-dim); }
+.agents .unv strong { color: var(--amber); font-weight: 600; }
+.agents .src { margin: 4px 0 0; font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-dim); opacity: .8; }
+/* auto tour for recording: ?tour (or #tour); ?tour=clean hides the page chrome */
+.touring .hint { display: none; }
+.tour-clean .masthead, .tour-clean .board, .tour-clean .dock, .tour-clean .finds { display: none !important; }
+.tour-clean .toast { bottom: calc(env(safe-area-inset-bottom, 0px) + 28px); }
 .actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel-2); text-decoration: none; font-weight: 600; font-size: 14.5px; cursor: pointer; }
 .btn.primary { flex: 1 1 100%; background: var(--c); border-color: var(--c); color: #0a1026; box-shadow: 0 0 24px color-mix(in srgb, var(--c) 45%, transparent); }
@@ -250,12 +342,28 @@ a { color: inherit; }
 </head>
 <body>
 <div class="app">
-  <main class="scene" id="scene" data-time="dusk">
+  <main class="scene" id="scene" data-time="day">
     <svg class="world" id="world" viewBox="40 110 920 640" preserveAspectRatio="xMidYMid meet" role="group" aria-label="A floating island with a workshop for each project and things to play with"></svg>
-    <header class="masthead">
-      <div class="eyebrow">Ankit Patel · Island Lab</div>
-      <h1>Nine workshops, one island</h1>
-      <p>I build apps with AI agents. Each building is one of them. Everything else here is just for fun.</p>
+    <header class="masthead" id="mast">
+      <div class="bar">
+        <div class="who">
+          <div class="eyebrow">Ankit Patel<span class="eb-more"> · Island Lab</span></div>
+          <h1>I ship real apps by directing AI agents</h1>
+        </div>
+        <div class="bar-btns">
+          <button type="button" class="cta-main" id="btn-projects">Projects</button>
+          <button type="button" class="icon-btn" id="btn-about" aria-expanded="false" aria-controls="intro" aria-label="About Ankit and contact links"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg></button>
+        </div>
+      </div>
+      <div class="intro" id="intro">
+        <p>Not an engineer, a builder. I took Blink Stop from a web game to the App Store with Claude Code, and versions 1.0 and 1.0.1 shipped in November 2026. Immerse is live too, and five more are on the bench.<span class="lead-more"> Each building here is one of them.</span></p>
+        <p class="role">Open to roles building with AI at labs and startups</p>
+        <nav class="cta" aria-label="Contact">
+          <a href="https://www.linkedin.com/in/ankitpatel12/" target="_blank" rel="noopener">LinkedIn</a>
+          <a href="https://x.com/RealAnkitPatel" target="_blank" rel="noopener" aria-label="X, @RealAnkitPatel">X</a>
+          <a href="https://github.com/LeoSzn12" target="_blank" rel="noopener">GitHub</a>
+        </nav>
+      </div>
     </header>
     <div class="hint" id="hint">Drag, pinch, tap anything</div>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -270,7 +378,7 @@ a { color: inherit; }
   <aside class="board" id="board" aria-labelledby="board-title">
     <div class="board-head">
       <span class="title" id="board-title">Harbor board · my projects</span>
-      <span class="sub">tap to go</span>
+      <button type="button" class="sub as-list" id="btn-list">List view</button>
     </div>
     <ul class="board-list" id="board-list"></ul>
   </aside>
@@ -278,58 +386,54 @@ a { color: inherit; }
 
 <div class="shop-backdrop" id="backdrop" hidden></div>
 <section class="shop" id="shop" role="dialog" aria-modal="true" aria-labelledby="shop-title" hidden></section>
+<section class="plist" id="plist" role="dialog" aria-modal="true" aria-labelledby="plist-title" hidden></section>
 
 <script>
 /* ---------- Shared project data (from the live portfolio) ---------- */
 const APPS = [
-  { id: "immerse", name: "Immerse", color: "#8d7bff", icon: "book", status: ["Live", "live"],
+  { id: "immerse", agents: {"lines": ["Started in August 2025 as a Replit project, built with Replit's AI agent: 567 commits through December 2025.", "Book upload, chapter audio with OpenAI voices, FFmpeg trailers and character portraits, on React, Vite and Express."], "unverified": "The App Store app and immersebooks.com are built in another place, so their later work isn't in this repo."}, built: "Shipped the iPhone app and the website: book trailers, character chat, series recaps and reader shelves.", name: "Immerse", color: "#8d7bff", icon: "book", status: ["Live", "live"],
     pitch: "Cinematic book trailers, a cast you can meet, and a bookshelf that shows who you are as a reader.",
     scan: ["Watch a book's trailer and meet its characters before you pick what to read next",
            "Catch up on a series with book-by-book recaps, or read the classics with audio",
            "Find books by trope or mood, and build a shelf with your Top 5 and half-star reviews"],
     tags: ["iPhone app", "Web"], standout: ["Standout", "Character chat: talk with the cast of a book."],
     links: [["Visit Immerse", "https://immersebooks.com", "primary"], ["App Store", "https://apps.apple.com/app/id6761164604"]] },
-  { id: "blink-stop", name: "Blink Stop", color: "#ff4d6d", icon: "eye", status: ["Live", "live"],
-    log: "Paired with Claude Code from the first commit to the App Store, including the iOS build and release pipeline.",
+  { id: "blink-stop", agents: {"lines": ["Began as a web game in November 2025, then became an iPhone app in fall 2026: on-device MediaPipe face tracking wrapped with Capacitor.", "Claude Code co-wrote about a third of the 94 commits, the November 2026 push: holiday skins, Balloon Pop, blink clips and App Store prep.", "GitHub Actions builds the iPhone app in the cloud and sends it to TestFlight after an approval step. The repo is at version 1.0.1."], "unverified": "The App Store release dates come from Ankit, not the repo."}, built: "Took it from a web game to an iPhone app on the App Store, with Claude Code on the November 2026 push. Versions 1.0 and 1.0.1 shipped in November 2026.", name: "Blink Stop", color: "#ff4d6d", icon: "eye", status: ["Live", "live"],
     pitch: "A staring contest against your phone's camera. Blink and you lose, so the whole family plays.",
     scan: ["Classic, Precision, Endurance and Daily modes, plus Balloon Pop",
            "Face tracking runs on the device, and scores stay on it",
            "Family scoreboard, holiday skins and shareable result cards"],
     tags: ["JavaScript", "MediaPipe", "Capacitor", "iOS", "Vercel"], standout: ["AI inside", "An on-device face-landmark model catches every blink in real time."],
     links: [["Play Blink Stop", "https://www.playblinkstop.com", "primary"], ["App Store", "https://apps.apple.com/us/app/blink-stop/id6822026817"], ["Code", "https://github.com/LeoSzn12/blink-stop"]] },
-  { id: "first-week", name: "First Week", color: "#ffc83f", icon: "record", status: ["In development", "dev"],
-    log: "Started July 2026 and built with Claude Code, working from one AGENTS.md rulebook.",
+  { id: "first-week", agents: {"lines": ["Started in July 2026 from a fresh Next.js app. CLAUDE.md points to one AGENTS.md, so every agent works from the same rules.", "Codex prepared the friends-and-deploy release, and Claude Code patched security issues in the dependencies.", "A critic panel scores each album with reasons, and Gemini can narrate it, with a local fallback when it's off."], "unverified": "Most of the 35 commits don't say which agent wrote them."}, built: "Built with agents from one AGENTS.md rulebook: the draft, the rival, the release week and a critic panel that explains its scores.", name: "First Week", color: "#ffc83f", icon: "record", status: ["In development", "dev"],
     pitch: "Draft an album against a rival, drop it, and see how it sells in its first week.",
     scan: ["Pick a lane: Hip-Hop, R&B, Country, EDM, Bollywood or a decade",
            "A rival with a personality, rule cards and a blind Snippet Round",
            "Release week results with a first-week number, an all-time ladder and a share card"],
     tags: ["Next.js", "TypeScript", "Zustand", "Web Audio", "Gemini"], standout: ["AI inside", "A critic panel scores each album with reasons you can read, and Gemini can narrate it."],
-    links: [["Code", "https://github.com/LeoSzn12/album-architect"]], sealed: "Opens at launch" },
-  { id: "electric-city", name: "Electric City", color: "#3fd2ff", icon: "bolt", status: ["In testing", "test"],
+    links: [["Play in your browser", "https://leoszn12.github.io/album-architect/", "primary"], ["Code", "https://github.com/LeoSzn12/album-architect"]] },
+  { id: "electric-city", agents: {"lines": ["The game is one web file. This repo wraps it as an offline iPhone and iPad app with Capacitor.", "Claude Code wrote all six commits here in November 2026: the app shell, tests on the app build, privacy and support pages and the App Store listing.", "GitHub Actions runs the tests on every push and builds TestFlight releases after an approval step."], "unverified": "How the game file itself was built isn't in this repo."}, built: "A phone and iOS game for kids, from wiring one house up to a whole city, with a guide who reads every step aloud.", name: "Electric City", color: "#3fd2ff", icon: "bolt", status: ["In testing", "test"],
     pitch: "Kids learn how power gets from the plant to the light switch by wiring up a city.",
     scan: ["Wire bulbs, switches, breakers and transformers, from one house up to a whole city",
            "Volt, a friendly guide who reads every step aloud",
            "A sandbox and a build-your-own-city mode"],
     tags: ["JavaScript", "Mobile web", "iOS"], standout: null,
     links: [], sealed: "Opens at launch" },
-  { id: "routine", name: "Routine", color: "#4ef09a", icon: "ring", status: ["In development", "dev"],
-    log: "Started November 2026 and built with Claude Code, for Cloudflare.",
+  { id: "routine", agents: {"lines": ["Started November 16, 2026: a Cloudflare Worker with a D1 database, plus agent tools (MCP) so an assistant can check you in and plan your day.", "Claude Code added the research-based habit coach and the GitHub Actions deploy to Cloudflare."], "unverified": "The first build commit is signed \"Routine builder\", so the agent behind it isn't named."}, built: "A Cloudflare app with agent tools (MCP) so an AI assistant can check you in and plan your day; Claude Code added the coach and the deploy.", name: "Routine", color: "#4ef09a", icon: "ring", status: ["In development", "dev"],
     pitch: "A daily habit coach that scores your day, keeps your streaks and nudges you at the right time.",
     scan: ["A score for every day, streaks and 28-day patterns",
            "Coaching tips grounded in habit research",
            "Phone reminders, works offline, its own sign-in"],
     tags: ["Cloudflare Workers", "D1", "Drizzle", "MCP", "Web Push"], standout: ["AI inside", "Agent tools (MCP) let an AI assistant check you in and plan your day."],
     links: [], sealed: "Opens at launch" },
-  { id: "eios", name: "EIOS", full: "Executive Intelligence OS", color: "#c9d0ff", icon: "council", status: ["In development", "dev"],
-    log: "Built July to October 2026 with Claude Code. The council also ships as a Claude Code plugin you can consult while you work.",
+  { id: "eios", agents: {"lines": ["Built July to October 2026. About two thirds of the 52 commits are co-written with Claude.", "52 advisor lenses answer from a private library of sources, and every answer shows its cited passages.", "The council also ships as a Claude Code plugin, and a GitHub Actions check runs it against real model providers."], "unverified": null}, built: "Built with Claude over four months: a council of 52 AI advisor lenses that cite their sources, also shipped as a Claude Code plugin.", name: "EIOS", full: "Executive Intelligence OS", color: "#c9d0ff", icon: "council", status: ["In development", "dev"],
     pitch: "Founders ask a business question, and a council of 52 AI advisors answers with sources and a first move.",
     scan: ["The right advisors are picked as you type, and each one cites its sources inline",
            "Second opinions, one-page briefs and a scoreboard of open experiments",
            "Built-in tools for unit economics, growth and cash runway"],
     tags: ["TypeScript", "Turborepo", "Claude API"], standout: ["AI inside", "A multi-model advisor council, with Claude as a provider, grounded in cited passages."],
     links: [], sealed: "Opens at launch" },
-  { id: "kinvest", name: "KinVest", color: "#ff9a6b", icon: "sprout", status: ["Pre-launch", "pre"],
-    log: "Started January 2026. Claude Code, Gemini and Abacus DeepAgent all build from one shared charter that keeps money handling honest.",
+  { id: "kinvest", agents: {"lines": ["Abacus DeepAgent built the first full version in January 2026.", "AGENTS.md holds a permanent agent charter, and CLAUDE.md and GEMINI.md sit beside it. Its money rule: KinVest never holds the money.", "A pre-launch security pass landed in October 2026, and Claude Code handled the November dependency upgrades and launch checklist."], "unverified": "The October commits don't say which agent wrote them."}, built: "A first version by Abacus DeepAgent, then agents working from one charter that keeps money handling honest.", name: "KinVest", color: "#ff9a6b", icon: "sprout", status: ["Pre-launch", "pre"],
     pitch: "Gift pages for kids, where family give toward a child's future and leave messages they'll keep.",
     scan: ["Private child pages, goals and invite links for trusted family",
            "Gifts go through approved providers, so KinVest never holds the money",
@@ -346,7 +450,8 @@ const APPS = [
     links: [] },
   { id: "about", name: "About Ankit", short: "About", color: "#f2f0ff", icon: "hello", status: ["Builder", "pre"],
     pitch: "I'm not a software engineer. I'm a builder, a tinkerer who can't leave a new model, tool or harness alone. When something new drops, I'm in it that night, poking at it to see how far it'll go. Sometimes it breaks. Sometimes it turns into an app: Immerse and Blink Stop are live on the App Store, and five more are in progress. I love every minute of it.",
-    scan: ["Shipped: Immerse and Blink Stop, both live on the web and the App Store",
+    scan: ["Open to roles building with AI at frontier labs and AI startups",
+           "Shipped: Immerse and Blink Stop, both live on the web and the App Store",
            "Building: five more, across learning, habits, music, money and founder tools"],
     tags: [], standout: null,
     links: [["Let's talk", "https://www.linkedin.com/in/ankitpatel12/", "primary"], ["X @RealAnkitPatel", "https://x.com/RealAnkitPatel"], ["GitHub", "https://github.com/LeoSzn12"]] }
@@ -367,6 +472,14 @@ const ICONS = {
 function iconSVG(name, size, stroke) {
   return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="${stroke || "currentColor"}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]}</svg>`;
 }
+/* Contact links. Resume and email stay empty until Ankit sends them; empty ones show as placeholders. */
+const CONTACT = [
+  ["LinkedIn", "https://www.linkedin.com/in/ankitpatel12/"],
+  ["X @RealAnkitPatel", "https://x.com/RealAnkitPatel"],
+  ["GitHub", "https://github.com/LeoSzn12"],
+  ["Resume", ""],
+  ["Email", ""]
+];
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const shortName = (a) => a.short || a.name;
 const REDUCED = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -408,25 +521,27 @@ const sfx = {
 
 /* ---------- Island geometry ---------- */
 const CX = 500, CY = 420, RX = 400, RY = 175;
+// Each project gets an original building in a 90s anime sky-island style. h = height, b = badge height, w = footprint half-width.
 const SPOTS = {
-  "about":         { a: 0,    r: 0,   h: 176, w: 32, kind: "tower" },
-  "immerse":       { a: -110, r: .72, h: 84,  w: 46, kind: "dome" },
-  "blink-stop":    { a: -65,  r: .72, h: 76,  w: 44, kind: "dish" },
-  "first-week":    { a: -150, r: .72, h: 68,  w: 44, kind: "flat" },
-  "electric-city": { a: -25,  r: .72, h: 90,  w: 40, kind: "mast" },
-  "eios":          { a: 20,   r: .72, h: 80,  w: 44, kind: "flat" },
-  "toolbox":       { a: 65,   r: .72, h: 50,  w: 54, kind: "shed" },
-  "kinvest":       { a: 115,  r: .72, h: 60,  w: 42, kind: "garden" },
-  "routine":       { a: 160,  r: .72, h: 64,  w: 42, kind: "dome" }
+  "about":         { a: 0,    r: 0,   h: 250, b: 0,   w: 30, kind: "lookout",  place: "The Lookout" },
+  "immerse":       { a: -110, r: .72, h: 80,  b: 120, w: 46, kind: "dome",     place: "Story Dome" },
+  "blink-stop":    { a: -62,  r: .72, h: 40,  b: 84,  w: 50, kind: "arena",    place: "Stare-Down Arena" },
+  "first-week":    { a: -150, r: .72, h: 70,  b: 110, w: 46, kind: "capsule",  place: "Drop Hall" },
+  "electric-city": { a: -32,  r: .72, h: 128, b: 160, w: 30, kind: "spark",    place: "Spark Tower" },
+  "eios":          { a: 48,   r: .72, h: 70,  b: 88,  w: 44, kind: "rotunda",  place: "Council Rotunda" },
+  "toolbox":       { a: 80,   r: .72, h: 44,  b: 78,  w: 44, kind: "garage",   place: "Gear Garage" },
+  "kinvest":       { at: [776, 664],  h: 52,  b: 98,  w: 40, kind: "cottage",  place: "Sprout Cottage" },
+  "routine":       { a: 125,  r: .8,  h: 72,  b: 96,  w: 34, kind: "pod",      place: "Habit Pod" }
 };
 APPS.forEach((a, i) => {
-  const s = SPOTS[a.id], rad = s.a * Math.PI / 180;
-  a.x = CX + Math.cos(rad) * RX * s.r; a.y = CY + Math.sin(rad) * RY * s.r;
-  a.spot = s; a.dock = "D" + (i + 1);
+  const s = SPOTS[a.id];
+  if (s.at) { a.x = s.at[0]; a.y = s.at[1]; }
+  else { const rad = s.a * Math.PI / 180; a.x = CX + Math.cos(rad) * RX * s.r; a.y = CY + Math.sin(rad) * RY * s.r; }
+  a.spot = s; a.place = s.place; a.dock = s.place;
 });
-const POND = { x: 500, y: 560, rx: 66, ry: 20 };
-const LIGHT = { x: 196, y: 318 };
-const CAT = { x: 512, y: 268 };
+const POND = { x: 440, y: 560, rx: 62, ry: 19 };
+const LIGHT = { x: 316, y: 314 };
+const CAT = { x: 560, y: 262 };
 const DOOR = { x: 556, y: 652 };
 
 function el(tag, attrs, parent) {
@@ -439,41 +554,102 @@ const pts = (arr) => arr.map((p) => p[0].toFixed(1) + "," + p[1].toFixed(1)).joi
 const onIsland = (x, y, k) => Math.pow((x - CX) / RX, 2) + Math.pow((y - CY) / RY, 2) < (k || .9);
 let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
 
+/* Cel-shaded drawing helpers: flat fills, a dark ink outline, one hard shadow on the right */
+const INK = "#1c2647", SHADE = "rgba(28, 38, 90, .17)";
+const paint = (f) => (f && f[0] === ".") ? { class: f.slice(1) } : { fill: f };
+const ink = (w) => ({ stroke: INK, "stroke-width": w || 2.2, "stroke-linejoin": "round", "stroke-linecap": "round" });
+const cylPath = (x, y, w, ry, h) => `M${x - w},${y - h} L${x - w},${y} A${w},${ry} 0 0 0 ${x + w},${y} L${x + w},${y - h} Z`;
+function cyl(g, x, y, w, ry, h, fill, o) {
+  o = o || {};
+  el("path", { d: cylPath(x, y, w, ry, h), ...paint(fill) }, g);
+  (o.bands || []).forEach(([b0, b1, c]) => el("path", { d: `M${x - w},${y - b1} L${x - w},${y - b0} A${w},${ry} 0 0 0 ${x + w},${y - b0} L${x + w},${y - b1} A${w},${ry} 0 0 1 ${x - w},${y - b1} Z`, fill: c }, g));
+  if (o.windows) {
+    const { at, n, r, c } = o.windows;
+    for (let k = 0; k < n; k++) {
+      const t = n === 1 ? 0 : -.72 + 1.44 * k / (n - 1), q = Math.sqrt(1 - t * t);
+      el("ellipse", { cx: x + w * t, cy: y - at + ry * q, rx: r * q, ry: r, fill: c || "#bfe9ff", class: "win", ...ink(1.4) }, g);
+    }
+  }
+  el("path", { d: `M${x + w * .38},${y - h} L${x + w * .38},${y + ry * .925} A${w},${ry} 0 0 0 ${x + w},${y} L${x + w},${y - h} Z`, fill: SHADE }, g);
+  el("path", { d: cylPath(x, y, w, ry, h), fill: "none", ...ink(o.iw) }, g);
+  if (!o.noTop) el("ellipse", { cx: x, cy: y - h, rx: w, ry, ...paint(o.top || fill), ...ink(o.iw) }, g);
+}
+function dome(g, x, yb, w, ry, hd, fill, o) {
+  o = o || {};
+  el("path", { d: `M${x - w},${yb} A${w},${hd} 0 0 1 ${x + w},${yb} A${w},${ry} 0 0 1 ${x - w},${yb} Z`, ...paint(fill) }, g);
+  if (o.band) el("path", { d: `M${x - w * .98},${yb - hd * .2} A${w},${ry} 0 0 0 ${x + w * .98},${yb - hd * .2}`, fill: "none", stroke: o.band, "stroke-width": o.bw || 6 }, g);
+  el("path", { d: `M${x + w * .3},${yb - hd * .95} Q${x + w * .98},${yb - hd * .75} ${x + w},${yb} A${w},${ry} 0 0 1 ${x + w * .4},${yb + ry * .92} Q${x + w * .7},${yb - hd * .4} ${x + w * .3},${yb - hd * .95} Z`, fill: SHADE }, g);
+  el("path", { d: `M${x - w * .62},${yb - hd * .42} A${w * .75},${hd * .75} 0 0 1 ${x - w * .18},${yb - hd * .86}`, fill: "none", stroke: "#fff", "stroke-width": 4, "stroke-linecap": "round", opacity: .85 }, g);
+  el("path", { d: `M${x - w},${yb} A${w},${hd} 0 0 1 ${x + w},${yb} A${w},${ry} 0 0 1 ${x - w},${yb} Z`, fill: "none", ...ink(o.iw) }, g);
+}
+function tree(p, x, y, big) {
+  const r = (big ? 14 : 11) + rnd() * 4, c = rnd() < .5 ? ["#3fae5a", "#6fd36d"] : ["#2f9a63", "#5cc77a"];
+  el("ellipse", { cx: x, cy: y + 2, rx: r * .9, ry: 4, fill: "#1f5a35", opacity: .3 }, p);
+  el("rect", { x: x - 2.5, y: y - 12, width: 5, height: 13, rx: 2, fill: "#8a5a34", ...ink(1.6) }, p);
+  el("circle", { cx: x, cy: y - 12 - r * .8, r, fill: c[0], ...ink(2) }, p);
+  el("circle", { cx: x - r * .3, cy: y - 12 - r * 1.05, r: r * .55, fill: c[1] }, p);
+}
+function palm(p, x, y, s, lean) {
+  s = s || 1; lean = lean || 1;
+  const tx = x + 14 * s * lean, ty = y - 40 * s;
+  el("path", { d: `M${x},${y} Q${x + 2 * s * lean},${y - 24 * s} ${tx},${ty}`, fill: "none", stroke: INK, "stroke-width": 7 * s, "stroke-linecap": "round" }, p);
+  el("path", { d: `M${x},${y} Q${x + 2 * s * lean},${y - 24 * s} ${tx},${ty}`, fill: "none", stroke: "#b07a45", "stroke-width": 4.4 * s, "stroke-linecap": "round" }, p);
+  [[-26, 6], [-14, -10], [4, -14], [20, -4], [26, 10]].forEach(([dx, dy]) => {
+    const d = `M${tx},${ty} q${dx * .5 * s},${(dy - 10) * s} ${dx * s},${dy * s}`;
+    el("path", { d, fill: "none", stroke: INK, "stroke-width": 7 * s, "stroke-linecap": "round" }, p);
+    el("path", { d, fill: "none", stroke: "#3cb562", "stroke-width": 4.4 * s, "stroke-linecap": "round" }, p);
+  });
+}
+
 world.innerHTML = `<defs>
   <linearGradient id="grass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="g-stop-1"/><stop offset="1" class="g-stop-2"/></linearGradient>
   <linearGradient id="cliff" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="c-stop-1"/><stop offset="1" class="c-stop-2"/></linearGradient>
   <linearGradient id="rock" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="r-stop-1"/><stop offset="1" class="r-stop-2"/></linearGradient>
-  <linearGradient id="water" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9ff0ff" stop-opacity=".95"/><stop offset="1" stop-color="#9ff0ff" stop-opacity="0"/></linearGradient>
+  <linearGradient id="seaG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="s-stop-2"/><stop offset=".12" class="s-stop-1"/><stop offset="1" class="s-stop-1"/></linearGradient>
+  <linearGradient id="water" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d6f6ff" stop-opacity=".95"/><stop offset="1" stop-color="#d6f6ff" stop-opacity="0"/></linearGradient>
   <linearGradient id="beam" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff3c4" stop-opacity=".85"/><stop offset="1" stop-color="#fff3c4" stop-opacity="0"/></linearGradient>
   <radialGradient id="halo"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
-  <radialGradient id="sunG"><stop offset="0" stop-color="#fff1cf"/><stop offset=".4" stop-color="#ffd59a" stop-opacity=".7"/><stop offset="1" stop-color="#ffb07a" stop-opacity="0"/></radialGradient>
-  <radialGradient id="pondG" cx=".5" cy=".4"><stop offset="0" stop-color="#bff6ff"/><stop offset="1" stop-color="#3fb9d8"/></radialGradient>
+  <radialGradient id="sunG"><stop offset="0" stop-color="#fffbe8"/><stop offset=".35" stop-color="#fff2c4" stop-opacity=".75"/><stop offset="1" stop-color="#ffe0a0" stop-opacity="0"/></radialGradient>
+  <radialGradient id="pondG" cx=".5" cy=".4"><stop offset="0" stop-color="#bff6ff"/><stop offset="1" stop-color="#3fa9e0"/></radialGradient>
 </defs>`;
 
-/* ---------- Sky ---------- */
+/* ---------- Sky: painted cumulus, a sea far below ---------- */
 const sky = el("g", {}, world);
-el("circle", { cx: 840, cy: 640, r: 190, fill: "url(#sunG)", class: "sun" }, sky);
+el("circle", { cx: 860, cy: 150, r: 190, fill: "url(#sunG)", class: "sun" }, sky);
 const moonG = el("g", { class: "moon" }, sky);
 el("circle", { cx: 200, cy: 210, r: 60, fill: "url(#halo)", opacity: .25 }, moonG);
 el("circle", { cx: 200, cy: 210, r: 24, fill: "#f4f1ff" }, moonG);
-el("circle", { cx: 211, cy: 203, r: 22, fill: "#0b1446" }, moonG);
+el("circle", { cx: 211, cy: 203, r: 22, fill: "#14215e" }, moonG);
 const stars = el("g", { class: "stars" }, sky);
 for (let i = 0; i < 36; i++) el("circle", { cx: -200 + rnd() * 1400, cy: -200 + rnd() * 500, r: rnd() * 1.6 + .5, fill: "#fff", class: "twinkle", style: `animation-delay:${(rnd() * 4).toFixed(2)}s` }, stars);
-[[120, 250, 1], [300, 170, .7], [640, 230, .9], [860, 310, .6]].forEach(([x, y, s], i) => {
-  const g = el("g", { class: "cloud", style: `animation-delay:${-i * 19}s;animation-duration:${70 + i * 14}s` }, sky);
-  el("ellipse", { cx: x - 500, cy: y, rx: 90 * s, ry: 16 * s, fill: "#ffffff", opacity: .2 }, g);
-  el("ellipse", { cx: x - 470, cy: y - 8 * s, rx: 46 * s, ry: 14 * s, fill: "#ffffff", opacity: .2 }, g);
-});
+// sea and horizon
+el("rect", { x: -3000, y: 704, width: 7000, height: 4000, fill: "url(#seaG)" }, sky);
+el("rect", { x: -3000, y: 702, width: 7000, height: 3, class: "sea-line" }, sky);
+[[-40, 700, 110, 10], [990, 701, 80, 7]].forEach(([x, y, rx, ry]) => el("path", { d: `M${x - rx},${y + 2} Q${x - rx * .4},${y - ry} ${x},${y - ry * .7} Q${x + rx * .5},${y - ry * 1.2} ${x + rx},${y + 2} Z`, class: "far-land" }, sky));
+for (let i = 0; i < 18; i++) { const x = -300 + rnd() * 1600, y = 720 + rnd() * 260; el("path", { d: `M${x},${y} q${10 + rnd() * 14},-3 ${24 + rnd() * 20},0`, class: "foam", fill: "none", "stroke-width": 2, "stroke-linecap": "round" }, sky); }
+// cumulus clouds: shadow puffs underneath, white puffs on top, flat painted base
+function cumulus(x, y, s, cls, delay, dur) {
+  const g = el("g", { class: cls, style: `animation-delay:${delay}s;animation-duration:${dur}s` }, sky);
+  const P = [[-70, 6, 30], [-36, -14, 40], [8, -30, 52], [56, -16, 42], [92, 4, 30], [-10, 2, 36], [40, 4, 34]];
+  P.forEach(([dx, dy, r]) => el("circle", { cx: x + dx * s, cy: y + (dy + 7) * s, r: r * s, class: "cloud-sh" }, g));
+  P.forEach(([dx, dy, r]) => el("circle", { cx: x + dx * s - 3 * s, cy: y + (dy - 2) * s, r: r * s * .94, class: "cloud-c" }, g));
+  el("rect", { x: x - 86 * s, y: y + 6 * s, width: 192 * s, height: 30 * s, rx: 15 * s, class: "cloud-sh" }, g);
+  return g;
+}
+cumulus(-260, 640, 1.5, "cloud slow", -10, 220);
+cumulus(1180, 610, 1.25, "cloud slow", -120, 260);
+cumulus(160, 120, .9, "cloud", -30, 140);
+cumulus(760, 60, .75, "cloud", -80, 170);
+cumulus(420, -90, .6, "cloud", -50, 200);
 [[110, 590, .34], [920, 520, .26], [230, 340, .18], [800, 200, .14]].forEach(([x, y, s]) => {
-  const g = el("g", { opacity: .55 }, sky);
-  el("ellipse", { cx: x, cy: y, rx: 120 * s, ry: 46 * s, class: "grass-hi" }, g);
-  el("polygon", { points: pts([[x - 120 * s, y], [x + 120 * s, y], [x + 20 * s, y + 170 * s], [x - 30 * s, y + 120 * s]]), fill: "url(#rock)" }, g);
+  const g = el("g", { opacity: .7 }, sky);
+  el("polygon", { points: pts([[x - 120 * s, y], [x + 120 * s, y], [x + 20 * s, y + 170 * s], [x - 30 * s, y + 120 * s]]), fill: "url(#rock)", ...ink(1.5) }, g);
+  el("ellipse", { cx: x, cy: y, rx: 120 * s, ry: 46 * s, class: "grass-hi", ...ink(1.5) }, g);
 });
 
 /* ---------- Island ---------- */
 const isle = el("g", { id: "isle" }, world);
-el("ellipse", { cx: CX, cy: 762, rx: 230, ry: 34, fill: "none", stroke: "#7ef3ff", "stroke-width": 3, class: "ring-pulse" }, isle);
-el("ellipse", { cx: CX, cy: 762, rx: 260, ry: 48, fill: "none", stroke: "#7ef3ff", "stroke-width": 10, opacity: .12 }, isle);
+el("ellipse", { cx: CX + 20, cy: 770, rx: 300, ry: 30, fill: "#0b2a66", opacity: .16 }, isle);
 const under = [], N = 24;
 for (let i = 0; i <= N; i++) {
   const t = i / N, ang = Math.PI * t;
@@ -481,13 +657,16 @@ for (let i = 0; i <= N; i++) {
   const depth = 120 + Math.sin(ang) * 170 + (i % 2 ? 26 : -8) * Math.sin(ang);
   under.push([x, CY + 30 + depth * Math.sin(ang) * .88]);
 }
-el("polygon", { points: pts([[CX - RX, CY + 28], ...under, [CX + RX, CY + 28]]), fill: "url(#rock)" }, isle);
-for (let i = 1; i < N; i += 2) el("line", { x1: under[i][0], y1: under[i][1], x2: under[i][0] + (i < N / 2 ? 18 : -18), y2: CY + 60, stroke: "#8f80d8", "stroke-width": 2, opacity: .25 }, isle);
+el("polygon", { points: pts([[CX - RX, CY + 28], ...under, [CX + RX, CY + 28]]), fill: "url(#rock)", ...ink(3) }, isle);
+// earth strata and a hard shadow down the right side
+for (let k = 1; k <= 3; k++) el("path", { d: `M${CX - RX * (1 - k * .12)},${CY + 40 + k * 34} Q${CX},${CY + 70 + k * 52} ${CX + RX * (1 - k * .12)},${CY + 40 + k * 34}`, fill: "none", stroke: "rgba(70, 35, 15, .32)", "stroke-width": 3 }, isle);
+el("polygon", { points: pts([[CX + 140, CY + 150], ...under.filter((p) => p[0] > CX + 120), [CX + RX, CY + 28]]), fill: "rgba(60, 25, 10, .18)" }, isle);
+for (let i = 1; i < N; i += 2) el("line", { x1: under[i][0], y1: under[i][1], x2: under[i][0] + (i < N / 2 ? 18 : -18), y2: CY + 60, stroke: "rgba(60, 25, 10, .3)", "stroke-width": 2 }, isle);
 
 // tiny door in the rock (secret)
 const door = el("g", { class: "toy", tabindex: "0", role: "button", "aria-label": "A tiny door in the rock", "data-toy": "door" }, isle);
-el("path", { d: `M${DOOR.x - 11},${DOOR.y + 14} v-14 a11 11 0 0 1 22 0 v14 z`, fill: "#1a1440", stroke: "#8f80d8", "stroke-width": 2 }, door);
-const doorLeaf = el("path", { d: `M${DOOR.x - 9},${DOOR.y + 14} v-13 a9 9 0 0 1 18 0 v13 z`, fill: "#6b4a35" }, door);
+el("path", { d: `M${DOOR.x - 11},${DOOR.y + 14} v-14 a11 11 0 0 1 22 0 v14 z`, fill: "#3a2416", ...ink(2) }, door);
+const doorLeaf = el("path", { d: `M${DOOR.x - 9},${DOOR.y + 14} v-13 a9 9 0 0 1 18 0 v13 z`, fill: "#d9574a" }, door);
 el("circle", { cx: DOOR.x + 5, cy: DOOR.y + 6, r: 1.6, fill: "#ffcf6b" }, door);
 el("ellipse", { class: "hit", cx: DOOR.x, cy: DOOR.y + 2, rx: 26, ry: 26, fill: "transparent" }, door);
 
@@ -495,132 +674,203 @@ el("ellipse", { class: "hit", cx: DOOR.x, cy: DOOR.y + 2, rx: 26, ry: 26, fill: 
 const CRYSTALS = [[CX - 130, 676], [CX + 40, 716], [CX + 170, 680], [CX - 40, 738]];
 const crystalNodes = CRYSTALS.map(([x, y], i) => {
   const g = el("g", { class: "toy", tabindex: "0", role: "button", "aria-label": `Crystal ${i + 1}`, "data-toy": "crystal", "data-n": i }, isle);
-  const c = i % 2 ? "#7ef3ff" : "#ff7ad9";
-  el("polygon", { points: pts([[x - 16, y - 40], [x + 16, y - 40], [x, y + 26]]), fill: c, opacity: .25 }, g);
-  const core = el("polygon", { points: pts([[x - 9, y - 34], [x + 9, y - 34], [x, y + 14]]), fill: c, class: "ping" }, g);
+  const c = i % 2 ? "#7ef3ff" : "#ff8fd6";
+  el("polygon", { points: pts([[x - 16, y - 40], [x + 16, y - 40], [x, y + 26]]), fill: c, opacity: .28 }, g);
+  const core = el("polygon", { points: pts([[x - 9, y - 34], [x + 9, y - 34], [x, y + 14]]), fill: c, class: "ping", ...ink(2) }, g);
   el("ellipse", { class: "hit", cx: x, cy: y - 10, rx: 26, ry: 34, fill: "transparent" }, g);
   return core;
 });
 
 // cliff + top
-el("ellipse", { cx: CX, cy: CY + 30, rx: RX, ry: RY, fill: "url(#cliff)" }, isle);
-const grass = el("ellipse", { cx: CX, cy: CY, rx: RX, ry: RY, fill: "url(#grass)", "data-grass": "1" }, isle);
-el("ellipse", { cx: CX - 40, cy: CY - 34, rx: RX * .78, ry: RY * .6, class: "grass-hi", opacity: .35, "data-grass": "1" }, isle);
+el("ellipse", { cx: CX, cy: CY + 30, rx: RX, ry: RY, fill: "url(#cliff)", ...ink(3) }, isle);
+const grass = el("ellipse", { cx: CX, cy: CY, rx: RX, ry: RY, fill: "url(#grass)", "data-grass": "1", ...ink(3) }, isle);
+el("path", { d: `M${CX - RX * .86},${CY - 20} Q${CX - 120},${CY - RY * 1.02} ${CX + RX * .7},${CY - RY * .62} Q${CX + 80},${CY - RY * .3} ${CX - RX * .86},${CY - 20} Z`, class: "grass-hi", opacity: .55, "data-grass": "1" }, isle);
 
 // waterfall off the left lip
-el("rect", { x: CX - 330, y: CY + 80, width: 22, height: 230, fill: "url(#water)", opacity: .7 }, isle);
-el("line", { x1: CX - 319, y1: CY + 80, x2: CX - 319, y2: CY + 310, stroke: "#e6fdff", "stroke-width": 3, class: "fall", opacity: .8 }, isle);
+el("rect", { x: CX - 330, y: CY + 80, width: 22, height: 230, fill: "url(#water)", opacity: .8 }, isle);
+el("line", { x1: CX - 319, y1: CY + 80, x2: CX - 319, y2: CY + 310, stroke: "#ffffff", "stroke-width": 3, class: "fall", opacity: .9 }, isle);
 
-// glowing paths
-const paths = el("g", { opacity: .8, "pointer-events": "none" }, isle);
-APPS.forEach((a) => {
-  if (a.id === "about") return;
-  const d = `M${CX},${CY} Q${(CX + a.x) / 2},${(CY + a.y) / 2 + 18} ${a.x},${a.y}`;
-  el("path", { d, fill: "none", stroke: "#e9fff6", "stroke-width": 6, "stroke-linecap": "round", opacity: .35 }, paths);
-  el("path", { d, fill: "none", stroke: a.color, "stroke-width": 1.8, "stroke-dasharray": "2 7", "stroke-linecap": "round" }, paths);
-});
+// sandy walkways from the Lookout plaza to each building
+const paths = el("g", { "pointer-events": "none" }, isle);
+const walk = (a) => `M${CX},${CY} Q${(CX + a.x) / 2},${(CY + a.y) / 2 + 18} ${a.x},${a.y}`;
+APPS.forEach((a) => { if (a.id !== "about" && !a.spot.at) el("path", { d: walk(a), fill: "none", stroke: INK, "stroke-width": 15, "stroke-linecap": "round", opacity: .5 }, paths); });
+APPS.forEach((a) => { if (a.id !== "about" && !a.spot.at) el("path", { d: walk(a), fill: "none", class: "walk", "stroke-width": 11, "stroke-linecap": "round" }, paths); });
+el("ellipse", { cx: CX, cy: CY + 4, rx: 70, ry: 28, class: "walk-f", ...ink(2.5) }, paths);
+for (let k = -2; k <= 2; k++) el("line", { x1: CX + k * 24 - 10, y1: CY - 18, x2: CX + k * 24 + 10, y2: CY + 26, stroke: INK, "stroke-width": 1, opacity: .25 }, paths);
 
 // pond (skip stones)
 const pond = el("g", { class: "toy", tabindex: "0", role: "button", "aria-label": "Pond. Skip a stone", "data-toy": "pond" }, isle);
-el("ellipse", { cx: POND.x, cy: POND.y + 3, rx: POND.rx + 6, ry: POND.ry + 5, fill: "#9a8fd0" }, pond);
-el("ellipse", { cx: POND.x, cy: POND.y, rx: POND.rx, ry: POND.ry, fill: "url(#pondG)" }, pond);
-el("path", { d: `M${POND.x - 40},${POND.y - 4} q10 -4 20 0 M${POND.x + 14},${POND.y + 6} q10 -4 20 0`, stroke: "#fff", "stroke-width": 1.5, fill: "none", opacity: .6 }, pond);
+el("ellipse", { cx: POND.x, cy: POND.y + 3, rx: POND.rx + 7, ry: POND.ry + 6, class: "walk-f", ...ink(2.2) }, pond);
+el("ellipse", { cx: POND.x, cy: POND.y, rx: POND.rx, ry: POND.ry, fill: "url(#pondG)", ...ink(1.8) }, pond);
+el("path", { d: `M${POND.x - 40},${POND.y - 4} q10 -4 20 0 M${POND.x + 14},${POND.y + 6} q10 -4 20 0`, stroke: "#fff", "stroke-width": 1.8, fill: "none", opacity: .8 }, pond);
 const pondFx = el("g", {}, pond);
 el("ellipse", { class: "hit", cx: POND.x, cy: POND.y, rx: POND.rx + 10, ry: POND.ry + 14, fill: "transparent" }, pond);
 
 // garden layer (planted glowblooms)
 const garden = el("g", {}, isle);
 
-/* ---------- Buildings + props in painter's order ---------- */
+/* ---------- Buildings ---------- */
 function drawBuilding(a, parent) {
-  const { x, y } = a, s = a.spot, w = s.w, d = w * .5, h = s.h;
-  const g = el("g", { class: "bld", tabindex: "0", role: "button", "aria-label": `${a.name}, ${a.status[0]}. Open workshop`, "data-id": a.id }, parent);
-  el("ellipse", { cx: x, cy: y + 4, rx: w + 14, ry: d + 8, fill: "#103f3b", opacity: .3 }, g);
-  const T = [x, y - h - d], R = [x + w, y - h], B = [x, y - h + d], L = [x - w, y - h];
-  const R0 = [x + w, y], B0 = [x, y + d], L0 = [x - w, y];
-  el("polygon", { points: pts([L, B, B0, L0]), class: "wall-l" }, g);
-  el("polygon", { points: pts([B, R, R0, B0]), class: "wall-r" }, g);
-  if (s.kind === "tower") {
-    for (let k = 1; k <= 4; k++) {
-      const yy = y - k * (h / 5);
-      el("polygon", { points: pts([[x - w, yy - 7], [x, yy + d - 7], [x, yy + d], [x - w, yy]]), fill: a.color, class: "win" }, g);
-      el("polygon", { points: pts([[x, yy + d - 7], [x + w, yy - 7], [x + w, yy], [x, yy + d]]), fill: a.color, class: "win", opacity: .7 }, g);
+  const { x, y } = a, s = a.spot, w = s.w, c = a.color;
+  const g = el("g", { class: "bld", tabindex: "0", role: "button", "aria-label": `${a.name}, ${s.place}, ${a.status[0]}. Open workshop`, "data-id": a.id }, parent);
+  if (s.kind !== "cottage") el("ellipse", { cx: x, cy: y + 4, rx: w + 16, ry: w * .5 + 8, fill: "#1f5a35", opacity: .28 }, g);
+  if (s.kind === "lookout") {
+    // a slender striped tower, a saucer lookout on top, and a sky platform floating above it
+    cyl(g, x, y, 26, 10, 14, ".walk-f");
+    const py = y - 14, ph = 140;
+    cyl(g, x, py, 11, 4.5, ph, ".w1", { bands: [20, 50, 80, 110].map((b) => [b, b + 12, "#ff9f43"]), iw: 2 });
+    const ly = py - ph;
+    el("path", { d: `M${x - 36},${ly} Q${x},${ly + 34} ${x + 36},${ly} Z`, fill: "#ffd9a8", ...ink(2.2) }, g);
+    cyl(g, x, ly, 36, 13, 22, ".w1", { windows: { at: 11, n: 5, r: 4.5 }, bands: [[0, 4, c]] });
+    dome(g, x, ly - 22, 36, 13, 22, "#ff9f43", { band: "#ffffff", bw: 3 });
+    el("line", { x1: x, y1: ly - 44, x2: x, y2: ly - 60, ...ink(2.5) }, g);
+    el("circle", { cx: x, cy: ly - 62, r: 4, fill: "#ff5f6d", ...ink(1.6), class: "win" }, g);
+    const sp = el("g", { class: "float" }, g), yp = ly - 96;
+    el("path", { d: `M${x - 72},${yp + 8} Q${x},${yp + 62} ${x + 72},${yp + 8} Z`, fill: "#c98a4b", ...ink(2.2) }, sp);
+    el("path", { d: `M${x - 72},${yp} L${x - 72},${yp + 8} A72,17 0 0 0 ${x + 72},${yp + 8} L${x + 72},${yp} Z`, fill: "#e8a960", ...ink(2.2) }, sp);
+    el("path", { d: `M${x - 72},${yp + 4} A72,17 0 0 0 ${x + 72},${yp + 4}`, fill: "none", stroke: "#d9574a", "stroke-width": 2.5 }, sp);
+    el("ellipse", { cx: x, cy: yp, rx: 72, ry: 17, fill: "#f6f3e6", ...ink(2.2) }, sp);
+    for (let k = -1; k <= 1; k++) el("line", { x1: x + k * 30 - 4, y1: yp - 12, x2: x + k * 30 + 4, y2: yp + 12, stroke: "#c9c3ad", "stroke-width": 1.2 }, sp);
+    dome(sp, x + 14, yp - 2, 15, 6, 14, ".w1", { band: c, bw: 3, iw: 1.8 });
+    [[-44, 2], [-28, -6], [44, 0]].forEach(([dx, dy]) => { el("circle", { cx: x + dx, cy: yp + dy - 9, r: 7, fill: "#3fae5a", ...ink(1.6) }, sp); el("line", { x1: x + dx, y1: yp + dy - 2, x2: x + dx, y2: yp + dy + 2, ...ink(2) }, sp); });
+  } else if (s.kind === "dome") {
+    cyl(g, x, y, w, 18, 32, ".w1", { bands: [[24, 32, c]], windows: { at: 12, n: 5, r: 4.5 } });
+    dome(g, x, y - 32, w, 18, 46, ".w1", { band: c, bw: 5 });
+    el("ellipse", { cx: x, cy: y - 32 - 44, rx: 12, ry: 5, fill: c, ...ink(1.8) }, g);
+    el("line", { x1: x, y1: y - 80, x2: x, y2: y - 94, ...ink(2.2) }, g);
+    el("circle", { cx: x, cy: y - 96, r: 4, fill: "#ffffff", ...ink(1.6) }, g);
+  } else if (s.kind === "arena") {
+    // tiered open-air stands behind a tiled fighting stage, with pennants
+    const back = (R, rr, hh, fill) => el("path", { d: `M${x - R},${y} L${x - R},${y - hh} A${R},${rr} 0 0 1 ${x + R},${y - hh} L${x + R},${y} A${R},${rr} 0 0 0 ${x - R},${y} Z`, fill, ...ink(2) }, g);
+    back(w + 26, 30, 34, "#f2c48d"); back(w + 14, 24, 20, "#ffe0b5");
+    [[w + 26, 30, 24], [w + 26, 30, 14], [w + 14, 24, 10]].forEach(([R, rr, hh]) => el("path", { d: `M${x - R},${y - hh} A${R},${rr} 0 0 1 ${x + R},${y - hh}`, fill: "none", stroke: "rgba(140, 80, 30, .35)", "stroke-width": 1.4 }, g));
+    for (let k = 0; k < 7; k++) {
+      const t = Math.PI + Math.PI * (k + .5) / 7, px = x + Math.cos(t) * (w + 26), py = y - 34 + Math.sin(t) * 30;
+      el("line", { x1: px, y1: py, x2: px, y2: py - 22, ...ink(1.8) }, g);
+      el("path", { d: `M${px},${py - 22} l12,4 l-12,5 z`, fill: k % 2 ? c : "#ffcf3f", ...ink(1.4) }, g);
     }
-    el("polygon", { points: pts([T, R, B, L]), class: "roof" }, g);
-    el("ellipse", { cx: x, cy: y - h - 4, rx: w + 18, ry: d + 8, fill: "none", stroke: "#ffcf6b", "stroke-width": 7, opacity: .25 }, g);
-    el("ellipse", { cx: x, cy: y - h - 4, rx: w + 18, ry: d + 8, fill: "none", stroke: "#ffcf6b", "stroke-width": 2.5 }, g);
-    el("line", { x1: x, y1: y - h - d, x2: x, y2: y - h - 60, stroke: "#eef1ff", "stroke-width": 3 }, g);
-  } else {
-    const wy = y - h * .62;
-    el("polygon", { points: pts([[x - w + 6, wy - 3], [x - 4, wy + d - 5], [x - 4, wy + d + 8], [x - w + 6, wy + 10]]), fill: a.color, class: "win" }, g);
-    el("polygon", { points: pts([[x + 4, wy + d - 5], [x + w - 6, wy - 3], [x + w - 6, wy + 10], [x + 4, wy + d + 8]]), fill: a.color, class: "win", opacity: .8 }, g);
-    el("polygon", { points: pts([[x - w * .55, y + d * .45 - 28], [x - w * .3, y + d * .7 - 28], [x - w * .3, y + d * .7 - 2], [x - w * .55, y + d * .45 - 2]]), fill: "#20285a" }, g);
-    el("polygon", { points: pts([T, R, B, L]), class: "roof" }, g);
-    if (s.kind === "dome") {
-      el("path", { d: `M${x - w * .8},${y - h} a${w * .8},${w * .7} 0 0 1 ${w * 1.6},0 z`, fill: a.color, opacity: .85 }, g);
-      el("path", { d: `M${x - w * .5},${y - h - w * .3} a${w * .5},${w * .3} 0 0 1 ${w * .6},-${w * .25}`, fill: "none", stroke: "#fff", "stroke-width": 3, opacity: .6 }, g);
-    } else if (s.kind === "dish") {
-      el("line", { x1: x, y1: y - h, x2: x + 6, y2: y - h - 24, stroke: "#dfe4ff", "stroke-width": 3 }, g);
-      el("path", { d: `M${x - 20},${y - h - 32} q26,26 44,-11 z`, fill: "#dfe4ff", stroke: a.color, "stroke-width": 2 }, g);
-    } else if (s.kind === "mast") {
-      el("line", { x1: x, y1: y - h, x2: x, y2: y - h - 50, stroke: "#dfe4ff", "stroke-width": 3 }, g);
-      el("path", { d: `M${x - 11},${y - h - 20} L${x},${y - h - 50} L${x + 11},${y - h - 20}`, fill: "none", stroke: "#dfe4ff", "stroke-width": 2 }, g);
-      el("circle", { cx: x, cy: y - h - 52, r: 4.5, fill: a.color, class: "win" }, g);
-    } else if (s.kind === "garden") {
-      el("ellipse", { cx: x, cy: y - h, rx: w * .7, ry: d * .7, fill: "#3db77f" }, g);
-      el("path", { d: `M${x},${y - h} v-22 m0,8 q11,-15 22,-8 m-22,2 q-11,-11 -20,-4`, fill: "none", stroke: a.color, "stroke-width": 3, "stroke-linecap": "round" }, g);
-    } else if (s.kind === "shed") {
-      el("polygon", { points: pts([[x - w, y - h], [x, y - h - d - 18], [x + w, y - h], [x, y - h + d]]), fill: a.color, opacity: .92 }, g);
-    } else {
-      el("rect", { x: x - 11, y: y - h - d - 16, width: 22, height: 11, rx: 2, fill: a.color, opacity: .9 }, g);
+    const d = w * .5, T = [x, y - 10 - d], R = [x + w, y - 10], B = [x, y - 10 + d], L = [x - w, y - 10];
+    el("polygon", { points: pts([L, B, [x, y + d], [x - w, y]]), fill: "#dfe6f2", ...ink(2) }, g);
+    el("polygon", { points: pts([B, R, [x + w, y], [x, y + d]]), fill: "#b9c4dc", ...ink(2) }, g);
+    el("polygon", { points: pts([T, R, B, L]), fill: "#f4f6fb", ...ink(2.2) }, g);
+    for (let k = 1; k < 4; k++) {
+      const f = k / 4;
+      el("line", { x1: L[0] + (T[0] - L[0]) * f, y1: L[1] + (T[1] - L[1]) * f, x2: B[0] + (R[0] - B[0]) * f, y2: B[1] + (R[1] - B[1]) * f, stroke: "#b9c4dc", "stroke-width": 1.4 }, g);
+      el("line", { x1: L[0] + (B[0] - L[0]) * f, y1: L[1] + (B[1] - L[1]) * f, x2: T[0] + (R[0] - T[0]) * f, y2: T[1] + (R[1] - T[1]) * f, stroke: "#b9c4dc", "stroke-width": 1.4 }, g);
     }
+    el("path", { d: `M${x - 9},${y - 10} q9,-7 18,0 q-9,7 -18,0 z`, fill: "#fff", ...ink(1.6) }, g);
+    el("circle", { cx: x, cy: y - 10, r: 3, fill: c }, g);
+  } else if (s.kind === "capsule") {
+    [-24, 24].forEach((dx) => el("rect", { x: x + dx - 3, y: y - 16, width: 6, height: 16, fill: "#8c97b8", ...ink(1.6) }, g));
+    const bw = w, bh = 40, by = y - 14 - bh;
+    el("rect", { x: x - bw, y: by, width: bw * 2, height: bh, rx: bh / 2, class: "w1", ...ink(2.2) }, g);
+    el("rect", { x: x - bw + 6, y: by + bh / 2 - 4, width: bw * 2 - 12, height: 8, rx: 4, fill: c, ...ink(1.4) }, g);
+    el("path", { d: `M${x - bw + bh / 2},${by + bh - 2} H${x + bw - bh / 2} A${bh / 2},${bh / 2} 0 0 0 ${x + bw - 1},${by + bh / 2 + 4} H${x - bw + 1} A${bh / 2},${bh / 2} 0 0 0 ${x - bw + bh / 2},${by + bh - 2} Z`, fill: SHADE }, g);
+    [-22, 22].forEach((dx) => el("circle", { cx: x + dx, cy: by + 11, r: 5, fill: "#bfe9ff", class: "win", ...ink(1.4) }, g));
+    el("rect", { x: x - 7, y: by + bh - 16, width: 14, height: 16, rx: 6, fill: "#5e6b94", ...ink(1.6) }, g);
+    el("line", { x1: x + 12, y1: by + 2, x2: x + 12, y2: by - 10, ...ink(2) }, g);
+    el("ellipse", { cx: x + 12, cy: by - 16, rx: 20, ry: 8, fill: "#262a3a", ...ink(1.8) }, g);
+    el("ellipse", { cx: x + 12, cy: by - 16, rx: 6, ry: 2.4, fill: c }, g);
+  } else if (s.kind === "spark") {
+    cyl(g, x, y, w, 12, 40, ".w1", { bands: [[28, 36, c]], windows: { at: 14, n: 3, r: 4 } });
+    const sy = y - 40 - 22;
+    el("circle", { cx: x, cy: sy, r: 26, class: "w1", ...ink(2.2) }, g);
+    el("path", { d: `M${x - 26},${sy} A26,8 0 0 0 ${x + 26},${sy}`, fill: "none", stroke: c, "stroke-width": 5 }, g);
+    el("path", { d: `M${x + 8},${sy - 25} A26,26 0 0 1 ${x + 9},${sy + 24} A20,26 0 0 0 ${x + 8},${sy - 25} Z`, fill: SHADE }, g);
+    el("path", { d: `M${x - 15},${sy - 10} A18,18 0 0 1 ${x - 4},${sy - 20}`, fill: "none", stroke: "#fff", "stroke-width": 4, "stroke-linecap": "round" }, g);
+    el("circle", { cx: x, cy: sy, r: 26, fill: "none", ...ink(2.2) }, g);
+    el("line", { x1: x, y1: sy - 26, x2: x, y2: sy - 62, ...ink(2.6) }, g);
+    el("path", { d: `M${x + 3},${sy - 58} l-9,14 h7 l-4,12 l11,-16 h-7 l5,-10 z`, fill: "#ffe14d", ...ink(1.6) }, g);
+    el("circle", { cx: x, cy: sy - 64, r: 4.5, fill: c, class: "win", ...ink(1.6) }, g);
+  } else if (s.kind === "rotunda") {
+    [[-50, -6], [50, -6]].forEach(([dx, dy]) => { cyl(g, x + dx, y + dy, 13, 5, 12, ".w1", { bands: [[8, 12, c]], iw: 1.8 }); dome(g, x + dx, y + dy - 12, 13, 5, 13, ".w1", { iw: 1.8 }); });
+    cyl(g, x, y, w - 4, 15, 26, ".w1", { windows: { at: 13, n: 6, r: 4 } });
+    el("ellipse", { cx: x, cy: y - 26, rx: w, ry: 17, fill: c, ...ink(2) }, g);
+    dome(g, x, y - 30, w - 4, 15, 38, ".w1", { band: c, bw: 4 });
+    el("circle", { cx: x, cy: y - 70, r: 5, fill: c, ...ink(1.6) }, g);
+  } else if (s.kind === "pod") {
+    [[-18, 2], [18, 2], [0, 8]].forEach(([dx, dy]) => el("line", { x1: x + dx * .45, y1: y - 26, x2: x + dx, y2: y + dy, ...ink(3) }, g));
+    const ey = y - 48;
+    el("ellipse", { cx: x, cy: ey, rx: 26, ry: 32, class: "w1", ...ink(2.2) }, g);
+    el("path", { d: `M${x + 7},${ey - 31} A26,32 0 0 1 ${x + 8},${ey + 31} A20,32 0 0 0 ${x + 7},${ey - 31} Z`, fill: SHADE }, g);
+    el("path", { d: `M${x - 28},${ey + 6} A28,9 0 0 0 ${x + 28},${ey + 6}`, fill: "none", stroke: INK, "stroke-width": 8, "stroke-linecap": "round" }, g);
+    el("path", { d: `M${x - 28},${ey + 6} A28,9 0 0 0 ${x + 28},${ey + 6}`, fill: "none", stroke: c, "stroke-width": 5, "stroke-linecap": "round" }, g);
+    el("circle", { cx: x - 4, cy: ey - 10, r: 10, fill: "#bfe9ff", class: "win", ...ink(1.8) }, g);
+    el("path", { d: `M${x - 9},${ey - 10} l4,4 l7,-8`, fill: "none", stroke: c, "stroke-width": 2.6, "stroke-linecap": "round", "stroke-linejoin": "round" }, g);
+    el("path", { d: `M${x - 16},${ey - 18} A20,26 0 0 1 ${x - 6},${ey - 28}`, fill: "none", stroke: "#fff", "stroke-width": 3.5, "stroke-linecap": "round" }, g);
+  } else if (s.kind === "garage") {
+    const hd = 36, dx = 16, dy = -12;
+    el("path", { d: `M${x - w},${y} A${w},${hd} 0 0 1 ${x + w},${y} L${x + w + dx},${y + dy} A${w},${hd} 0 0 0 ${x - w + dx},${y + dy} Z`, class: "w2", ...ink(2.2) }, g);
+    el("path", { d: `M${x - w},${y} A${w},${hd} 0 0 1 ${x + w},${y} Z`, class: "w1", ...ink(2.2) }, g);
+    el("path", { d: `M${x - w * .6},${y} A${w * .6},${hd * .62} 0 0 1 ${x + w * .6},${y} Z`, fill: c, ...ink(1.8) }, g);
+    for (let k = 1; k <= 3; k++) el("line", { x1: x - w * .55, y1: y - k * 5.5, x2: x + w * .55, y2: y - k * 5.5, stroke: INK, "stroke-width": 1.2, opacity: .5 }, g);
+    el("path", { d: `M${x - w * .78},${y - hd * .55} A${w * .9},${hd * .9} 0 0 1 ${x - w * .2},${y - hd * .94}`, fill: "none", stroke: "#fff", "stroke-width": 3.5, "stroke-linecap": "round", opacity: .9 }, g);
+  } else if (s.kind === "cottage") {
+    // a tiny floating islet with a pink beach cottage and two palms
+    el("path", { d: `M${x - 64},${y} Q${x - 30},${y + 46} ${x - 2},${y + 74} Q${x + 30},${y + 40} ${x + 64},${y} Z`, fill: "url(#rock)", ...ink(2.4) }, g);
+    el("ellipse", { cx: x, cy: y, rx: 64, ry: 20, fill: "#f6dfa0", ...ink(2.4) }, g);
+    el("ellipse", { cx: x - 6, cy: y - 3, rx: 42, ry: 12, fill: "#7fd36a" }, g);
+    palm(g, x - 46, y + 2, .85, -1);
+    const hx = x + 2, hy = y + 4, hw = 22, hd = 11, hh = 22;
+    el("polygon", { points: pts([[hx - hw, hy - hh], [hx, hy - hh + hd], [hx, hy + hd], [hx - hw, hy]]), fill: "#ffb9cf", ...ink(2) }, g);
+    el("polygon", { points: pts([[hx, hy - hh + hd], [hx + hw, hy - hh], [hx + hw, hy], [hx, hy + hd]]), fill: "#f093b5", ...ink(2) }, g);
+    el("polygon", { points: pts([[hx - hw - 5, hy - hh + 1], [hx, hy - hh - 22], [hx + hw + 5, hy - hh + 1], [hx, hy - hh + hd + 4]]), fill: "#e2504f", ...ink(2) }, g);
+    el("polygon", { points: pts([[hx, hy - hh - 22], [hx + hw + 5, hy - hh + 1], [hx, hy - hh + hd + 4]]), fill: "rgba(80, 10, 20, .18)" }, g);
+    el("rect", { x: hx - 15, y: hy - 13, width: 7, height: 7, fill: "#ffffff", ...ink(1.4) }, g);
+    el("polygon", { points: pts([[hx + 6, hy + 8], [hx + 6, hy - 4], [hx + 12, hy - 7], [hx + 12, hy + 5]]), fill: "#8a5a34", ...ink(1.4) }, g);
+    palm(g, x + 44, y + 4, .95, 1);
+    el("path", { d: `M${x + 22},${y + 10} l4,-12 m0,0 q6,-6 10,0 m-10,0 q-6,-5 -9,1`, fill: "none", stroke: c, "stroke-width": 2.6, "stroke-linecap": "round" }, g);
   }
-  const topY = y - h - (s.kind === "tower" ? 100 : 70);
-  const holo = el("g", { class: "holo" }, g);
-  el("circle", { cx: x, cy: topY, r: 34, fill: a.color, opacity: .14 }, holo);
-  el("circle", { cx: x, cy: topY, r: 26, fill: "#0b1238", opacity: .7 }, holo);
-  el("circle", { cx: x, cy: topY, r: 26, fill: "none", stroke: a.color, "stroke-width": 2.5 }, holo);
-  const ic = el("g", { transform: `translate(${x - 15},${topY - 15}) scale(1.25)` }, holo);
-  ic.innerHTML = `<g fill="none" stroke="${a.color}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${ICONS[a.icon]}</g>`;
-  el("ellipse", { class: "hit", cx: x, cy: y - h / 2 - 14, rx: Math.max(w + 20, 62), ry: h / 2 + 64, fill: "transparent" }, g);
+  if (s.b) {
+    const topY = y - s.b - (s.kind === "lookout" ? 0 : 0);
+    const holo = el("g", { class: "holo" }, g);
+    el("circle", { cx: x, cy: topY, r: 22, fill: "#ffffff", ...ink(2.4) }, holo);
+    el("circle", { cx: x, cy: topY, r: 17, fill: "none", stroke: c, "stroke-width": 3 }, holo);
+    const ic = el("g", { transform: `translate(${x - 12},${topY - 12})` }, holo);
+    ic.innerHTML = `<g fill="none" stroke="${INK}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[a.icon]}</g>`;
+  }
+  const hh = Math.max(s.h, s.b || 0);
+  el("ellipse", { class: "hit", cx: x, cy: y - hh / 2 - 8, rx: Math.max(w + 22, 62), ry: hh / 2 + 44, fill: "transparent" }, g);
   return g;
 }
 function drawLighthouse(p) {
   const g = el("g", { class: "toy", tabindex: "0", role: "button", "aria-label": "Lighthouse. Switch the light", "data-toy": "light" }, p);
   const { x, y } = LIGHT;
-  el("ellipse", { cx: x, cy: y + 3, rx: 22, ry: 8, fill: "#103f3b", opacity: .3 }, g);
-  el("polygon", { points: pts([[x - 16, y], [x - 10, y - 70], [x + 10, y - 70], [x + 16, y]]), fill: "#f6f7ff" }, g);
-  [y - 18, y - 46].forEach((yy) => el("polygon", { points: pts([[x - 15 + (y - yy) * .085, yy], [x - 13.5 + (y - yy) * .085, yy - 10], [x + 13.5 - (y - yy) * .085, yy - 10], [x + 15 - (y - yy) * .085, yy]]), fill: "#ff5f7e" }, g));
-  el("rect", { x: x - 13, y: y - 74, width: 26, height: 5, fill: "#2b3769" }, g);
-  el("rect", { x: x - 8, y: y - 90, width: 16, height: 16, rx: 3, fill: "#2b3769" }, g);
+  el("ellipse", { cx: x, cy: y + 3, rx: 22, ry: 8, fill: "#1f5a35", opacity: .3 }, g);
+  el("polygon", { points: pts([[x - 16, y], [x - 10, y - 70], [x + 10, y - 70], [x + 16, y]]), fill: "#ffffff", ...ink(2) }, g);
+  [y - 18, y - 46].forEach((yy) => el("polygon", { points: pts([[x - 15 + (y - yy) * .085, yy], [x - 13.5 + (y - yy) * .085, yy - 10], [x + 13.5 - (y - yy) * .085, yy - 10], [x + 15 - (y - yy) * .085, yy]]), fill: "#e2504f" }, g));
+  el("polygon", { points: pts([[x + 3, y], [x + 4, y - 70], [x + 10, y - 70], [x + 16, y]]), fill: SHADE }, g);
+  el("rect", { x: x - 13, y: y - 74, width: 26, height: 5, fill: "#3a4570", ...ink(1.6) }, g);
+  el("rect", { x: x - 8, y: y - 90, width: 16, height: 16, rx: 3, fill: "#3a4570", ...ink(1.6) }, g);
   const lamp = el("rect", { x: x - 5, y: y - 87, width: 10, height: 10, rx: 2, fill: "#ffe8a3", opacity: .35 }, g);
-  el("path", { d: `M${x - 10},${y - 90} L${x},${y - 100} L${x + 10},${y - 90} z`, fill: "#ff5f7e" }, g);
+  el("path", { d: `M${x - 10},${y - 90} L${x},${y - 100} L${x + 10},${y - 90} z`, fill: "#e2504f", ...ink(1.6) }, g);
   el("ellipse", { class: "hit", cx: x, cy: y - 50, rx: 34, ry: 64, fill: "transparent" }, g);
   return lamp;
 }
 function drawCat(p) {
   const g = el("g", { class: "toy", tabindex: "0", role: "button", "aria-label": "Something small, asleep", "data-toy": "cat" }, p);
   const { x, y } = CAT;
-  el("ellipse", { cx: x, cy: y + 3, rx: 18, ry: 5, fill: "#103f3b", opacity: .3 }, g);
-  el("ellipse", { cx: x, cy: y - 6, rx: 16, ry: 9, fill: "#c8c0ea" }, g);
-  el("path", { d: `M${x + 14},${y - 2} q14 2 8 -10`, stroke: "#c8c0ea", "stroke-width": 4, fill: "none", "stroke-linecap": "round" }, g);
+  el("ellipse", { cx: x, cy: y + 3, rx: 18, ry: 5, fill: "#1f5a35", opacity: .3 }, g);
+  el("ellipse", { cx: x, cy: y - 6, rx: 16, ry: 9, fill: "#ffd08a", ...ink(1.8) }, g);
+  el("path", { d: `M${x + 14},${y - 2} q14 2 8 -10`, stroke: "#ffd08a", "stroke-width": 4, fill: "none", "stroke-linecap": "round" }, g);
   const head = el("g", {}, g);
-  el("circle", { cx: x - 13, cy: y - 10, r: 7.5, fill: "#d6cff2" }, head);
-  el("polygon", { points: pts([[x - 19, y - 14], [x - 18, y - 22], [x - 13, y - 16]]), fill: "#d6cff2" }, head);
-  el("polygon", { points: pts([[x - 12, y - 16], [x - 8, y - 22], [x - 7, y - 13]]), fill: "#d6cff2" }, head);
-  const eyes = el("path", { d: `M${x - 17},${y - 10} h3 M${x - 11},${y - 10} h3`, stroke: "#3a2f7c", "stroke-width": 1.4, "stroke-linecap": "round" }, head);
-  const z = el("text", { x: x - 6, y: y - 24, fill: "#fff", "font-family": "Sora, sans-serif", "font-size": 11, "font-weight": 700, class: "zz" }, g);
+  el("circle", { cx: x - 13, cy: y - 10, r: 7.5, fill: "#ffe0a8", ...ink(1.8) }, head);
+  el("polygon", { points: pts([[x - 19, y - 14], [x - 18, y - 22], [x - 13, y - 16]]), fill: "#ffe0a8", ...ink(1.4) }, head);
+  el("polygon", { points: pts([[x - 12, y - 16], [x - 8, y - 22], [x - 7, y - 13]]), fill: "#ffe0a8", ...ink(1.4) }, head);
+  const eyes = el("path", { d: `M${x - 17},${y - 10} h3 M${x - 11},${y - 10} h3`, stroke: INK, "stroke-width": 1.4, "stroke-linecap": "round" }, head);
+  const z = el("text", { x: x - 6, y: y - 24, fill: "#fff", stroke: INK, "stroke-width": .8, "font-family": "Sora, sans-serif", "font-size": 11, "font-weight": 700, class: "zz" }, g);
   z.textContent = "z";
   el("ellipse", { class: "hit", cx: x - 4, cy: y - 8, rx: 30, ry: 24, fill: "transparent" }, g);
   return { g, eyes, z, head };
 }
 
 const deco = [];
-for (let i = 0; i < 60 && deco.length < 22; i++) {
+for (let i = 0; i < 80 && deco.length < 24; i++) {
   const ang = rnd() * Math.PI * 2, rr = .25 + rnd() * .72;
   const x = CX + Math.cos(ang) * RX * rr, y = CY + Math.sin(ang) * RY * rr;
-  if (APPS.some((a) => Math.hypot((a.x - x) / 1.6, a.y - y) < 54)) continue;
-  if (Math.hypot((POND.x - x) / 2, POND.y - y) < 34 || Math.hypot(LIGHT.x - x, LIGHT.y - y) < 44 || Math.hypot(CAT.x - x, CAT.y - y) < 36) continue;
+  if (APPS.some((a) => Math.hypot((a.x - x) / 1.6, a.y - y) < 58)) continue;
+  if (Math.hypot((x - CX) / 2.2, y - CY) < 40) continue;
+  if (Math.hypot((POND.x - x) / 2, POND.y - y) < 36 || Math.hypot(LIGHT.x - x, LIGHT.y - y) < 44 || Math.hypot(CAT.x - x, CAT.y - y) < 36) continue;
   deco.push([x, y]);
 }
 let lampNode, catParts;
@@ -633,23 +883,19 @@ items.forEach((it) => {
   if (it.a) { it.a.node = drawBuilding(it.a, isle); return; }
   if (it.light) { lampNode = drawLighthouse(isle); return; }
   if (it.cat) { catParts = drawCat(isle); return; }
-  const [x, y] = it.tree;
-  if (rnd() < .72) {
-    el("ellipse", { cx: x, cy: y + 2, rx: 10, ry: 4, fill: "#174f45", opacity: .35 }, isle);
-    el("line", { x1: x, y1: y, x2: x, y2: y - 11, stroke: "#5b3f2c", "stroke-width": 3 }, isle);
-    el("circle", { cx: x, cy: y - 20, r: 11 + rnd() * 4, fill: rnd() < .5 ? "#2bbf8c" : "#49d6a3" }, isle);
-  } else {
-    el("ellipse", { cx: x, cy: y, rx: 8, ry: 5, fill: "#9a8fd0" }, isle);
-  }
+  const [x, y] = it.tree, r = rnd();
+  if (r < .55) tree(isle, x, y, r < .2);
+  else if (r < .78) palm(isle, x, y, .7, rnd() < .5 ? -1 : 1);
+  else { el("ellipse", { cx: x, cy: y, rx: 9, ry: 5.5, fill: "#b8b2a6", ...ink(1.6) }, isle); el("ellipse", { cx: x - 2, cy: y - 2, rx: 4, ry: 2, fill: "#fff", opacity: .6 }, isle); }
 });
 // name tags on their own layer so no roof ever hides one
 const tags = el("g", {}, isle);
 APPS.forEach((a) => {
-  const d = a.spot.w * .5, label = shortName(a), tw = label.length * 11.2 + 26;
+  const d = a.spot.kind === "cottage" ? 20 : a.spot.w * .5, label = shortName(a), tw = label.length * 11.2 + 26;
   const tag = el("g", { class: "bld", "data-id": a.id, "aria-hidden": "true" }, tags);
-  el("rect", { x: a.x - tw / 2, y: a.y + d + 8, width: tw, height: 30, rx: 15, fill: "#0b1238", opacity: .82 }, tag);
-  el("circle", { cx: a.x - tw / 2 + 13, cy: a.y + d + 23, r: 4, fill: a.color }, tag);
-  const t = el("text", { x: a.x + 6, y: a.y + d + 29.5, "text-anchor": "middle", fill: "#f3f5ff", "font-family": "Sora, system-ui, sans-serif", "font-size": 19, "font-weight": 700 }, tag);
+  el("rect", { x: a.x - tw / 2, y: a.y + d + 8, width: tw, height: 30, rx: 15, fill: "#ffffff", ...ink(2.4) }, tag);
+  el("circle", { cx: a.x - tw / 2 + 13, cy: a.y + d + 23, r: 4.5, fill: a.color, ...ink(1.4) }, tag);
+  const t = el("text", { x: a.x + 6, y: a.y + d + 29.5, "text-anchor": "middle", fill: INK, "font-family": "Sora, system-ui, sans-serif", "font-size": 19, "font-weight": 800 }, tag);
   t.textContent = label;
 });
 // lighthouse beam sits above everything on the island
@@ -662,12 +908,15 @@ for (let i = 0; i < 14; i++) {
   el("circle", { cx: CX + Math.cos(ang) * RX * rr, cy: CY - 20 + Math.sin(ang) * RY * rr, r: 2.2, fill: "#fff6a8", class: "fly",
     style: `--fx:${(rnd() * 40 - 20).toFixed(0)}px;--fy:${(rnd() * 30 - 22).toFixed(0)}px;--d:${(4 + rnd() * 5).toFixed(1)}s;animation-delay:${(-rnd() * 6).toFixed(1)}s` }, flies);
 }
-// drones (catchable)
+// hover pods (catchable): little round flying cars that circle the island
 const drones = [0, 1, 2].map((i) => {
   const g = el("g", { class: "toy", "data-toy": "drone", "aria-hidden": "true" }, world);
-  el("circle", { r: 8, fill: i === 1 ? "#ff7ad9" : "#7ef3ff", opacity: .25 }, g);
-  el("circle", { r: 3.8, fill: i === 1 ? "#ff7ad9" : "#7ef3ff" }, g);
-  el("circle", { r: 22, fill: "transparent" }, g);
+  const c = ["#ffcf3f", "#ff7ad9", "#4ec3ff"][i];
+  el("ellipse", { cy: 16, rx: 12, ry: 3, fill: "#1c2647", opacity: .18 }, g);
+  el("ellipse", { cx: 0, cy: 0, rx: 14, ry: 6, fill: "#ffffff", ...ink(1.8) }, g);
+  el("path", { d: "M-14,0 A14,6 0 0 0 14,0", fill: "none", stroke: c, "stroke-width": 3 }, g);
+  el("path", { d: "M-7,-3 A7,7 0 0 1 7,-3 Z", fill: "#bfe9ff", ...ink(1.6) }, g);
+  el("circle", { r: 24, fill: "transparent" }, g);
   return { g, i, zip: 0 };
 });
 
@@ -801,7 +1050,7 @@ const TIME_ICON = {
 };
 const btnTime = document.getElementById("btn-time"), btnSound = document.getElementById("btn-sound");
 function setTime(t) {
-  scene.dataset.time = t; store.set("time", t);
+  scene.dataset.time = t; store.set("time2", t);
   btnTime.innerHTML = TIME_ICON[t]; btnTime.setAttribute("aria-label", `Time of day: ${t}. Change`);
 }
 btnTime.addEventListener("click", () => { const t = TIMES[(TIMES.indexOf(scene.dataset.time) + 1) % TIMES.length]; setTime(t); sfx.click(); toast(t === "night" ? "Night. The fireflies are out." : t === "day" ? "Morning on the island." : "Back to dusk."); });
@@ -811,7 +1060,7 @@ function setSound(on) {
   btnSound.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="#f3f5ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/>${on ? '<path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/>' : '<path d="M16 9.5l5 5M21 9.5l-5 5"/>'}</svg>`;
 }
 btnSound.addEventListener("click", () => { setSound(!soundOn); sfx.click(); });
-setTime(store.get("time", "dusk")); setSound(soundOn);
+setTime(store.get("time2", "day")); setSound(soundOn);
 
 /* ---------- Harbor board ---------- */
 const list = document.getElementById("board-list");
@@ -851,8 +1100,10 @@ function fitHome() {
   const { W, H } = viewSize();
   const portrait = H > W * 1.05;
   // island, labels and rings span about x 150..850 and y 140..790 (center 465, height 650)
-  home.w = portrait ? 680 : Math.max(800, 780 * W / H);
-  const topCover = (portrait ? 140 : 95) * home.w / W; // masthead covers the top of the view
+  const mast = (document.querySelector(".masthead") || {}).offsetHeight || (portrait ? 140 : 95);
+  const room = Math.max(200, H - mast * .8); // keep the island clear of the masthead
+  home.w = Math.max(portrait ? 680 : Math.max(800, 780 * W / H), 650 * W / room);
+  const topCover = mast * .8 * home.w / W; // masthead covers the top of the view
   home.cx = portrait ? 508 : 500; home.cy = 465 - topCover / 2;
 }
 function flyTo(t, ms) {
@@ -966,14 +1217,14 @@ function render(a) {
     <div class="bench">${benchSVG(a)}<div class="readout" id="readout">Powering up · ${esc(a.dock)}</div>
       <button class="shop-x" id="shop-x" type="button" aria-label="Close workshop">×</button></div>
     <div class="shop-body reveal">
-      <div class="top"><div><h2 id="shop-title">${esc(a.name)}</h2>${a.full ? `<div class="full">${esc(a.full)}</div>` : ""}</div>
+      <div class="top"><div><h2 id="shop-title">${esc(a.name)}</h2><div class="full">${esc(a.place)}${a.full ? " · " + esc(a.full) : ""}</div></div>
         <span class="pill k-${a.status[1]}"><span class="dot"></span>${esc(a.status[0])}</span></div>
       <p class="lede">${esc(a.pitch)}</p>
       ${links || a.sealed ? `<div class="actions">${links}${a.sealed ? `<span class="sealed">Live site ${esc(a.sealed.toLowerCase())}</span>` : ""}</div>` : ""}
       <div><div class="sect-k">${a.id === "about" ? "So far" : a.id === "toolbox" ? "On the wall" : "On the bench"}</div><ul class="scan">${a.scan.map((s) => `<li>${esc(s)}</li>`).join("")}</ul></div>
       ${a.standout ? `<div class="callout"><div class="sect-k">${esc(a.standout[0])}</div>${esc(a.standout[1])}</div>` : ""}
       ${a.tags.length ? `<div><div class="sect-k">Built with</div><div class="chips">${a.tags.map((t) => `<span class="chip">${esc(t)}</span>`).join("")}</div></div>` : ""}
-      ${a.log ? `<p class="log"><strong>Build log.</strong> ${esc(a.log)}</p>` : ""}
+      ${a.agents ? `<div class="agents"><div class="sect-k">How I built this with agents</div><ul class="scan">${a.agents.lines.map((l) => `<li>${esc(l)}</li>`).join("")}</ul>${a.agents.unverified ? `<p class="unv"><strong>Not checked:</strong> ${esc(a.agents.unverified)}</p>` : ""}<p class="src">From the project's code history on GitHub.</p></div>` : ""}
       <div class="nav"><button type="button" data-go="${prev.id}">← ${esc(shortName(prev))}</button><button type="button" data-close>Back to island</button><button type="button" data-go="${next.id}">${esc(shortName(next))} →</button></div>
     </div>`;
   shop.querySelector("#shop-x").addEventListener("click", close);
@@ -1008,21 +1259,102 @@ function close() {
   if (!currentId) return;
   currentId = null;
   shop.classList.remove("open"); backdrop.classList.remove("open");
-  setTimeout(() => { if (!currentId) { shop.hidden = true; backdrop.hidden = true; } }, REDUCED ? 0 : 260);
+  setTimeout(() => { if (!currentId) { shop.hidden = true; if (!listOpen) backdrop.hidden = true; } }, REDUCED ? 0 : 260);
   flyTo(camBefore || home);
   try { history.replaceState(null, "", location.pathname + location.search); } catch (_) {}
   if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
 }
-backdrop.addEventListener("click", close);
+backdrop.addEventListener("click", () => { if (listOpen) closeList(); else close(); });
+
+/* ---------- Plain projects list ---------- */
+const plist = document.getElementById("plist");
+let listOpen = false, listFocus = null;
+const PROJECTS = APPS.filter((a) => a.id !== "about" && a.id !== "toolbox");
+const contactHTML = () => CONTACT.map(([label, href]) => href
+  ? `<a href="${href}" ${href.startsWith("mailto:") ? "" : 'target="_blank" rel="noopener"'}>${esc(label)}</a>`
+  : `<span title="Coming soon">${esc(label)} (adding soon)</span>`).join("");
+function renderList() {
+  const tool = APPS.find((a) => a.id === "toolbox");
+  plist.innerHTML = `
+    <div class="plist-head"><div><h2 id="plist-title">Projects</h2><p class="role">Open to roles building with AI at labs and startups</p></div>
+      <button class="shop-x" type="button" data-close-list aria-label="Close projects list">×</button></div>
+    <div class="plist-body">
+      ${PROJECTS.map((a) => `
+      <article class="pcard" style="--c:${a.color}">
+        <div class="top"><h3><span class="ic">${iconSVG(a.icon, 18)}</span>${esc(a.name)}</h3><span class="pill k-${a.status[1]}"><span class="dot"></span>${esc(a.status[0])}</span></div>
+        <p><span class="k">What it is</span>${esc(a.pitch)}</p>
+        <p><span class="k">What I built</span>${esc(a.built || "")}</p>
+        <div class="acts">${a.links.map(([label, href, kind]) => `<a class="${kind === "primary" ? "primary" : ""}" href="${href}" target="_blank" rel="noopener">${esc(label)}</a>`).join("")}${a.links.some((l) => l[2] === "primary") ? "" : "<span>In progress</span>"}<button type="button" data-shop="${a.id}">Its workshop</button></div>
+      </article>`).join("")}
+      <div class="callout" style="--c:${tool.color}"><div class="sect-k">${esc(tool.standout[0])}</div>${esc(tool.standout[1])}</div>
+      <div><div class="sect-k">Get in touch</div><div class="contact">${contactHTML()}</div></div>
+    </div>`;
+  plist.querySelector("[data-close-list]").addEventListener("click", closeList);
+  plist.querySelectorAll("[data-shop]").forEach((b) => b.addEventListener("click", () => { closeList(true); open(b.dataset.shop); }));
+}
+function openList() {
+  if (currentId) close();
+  if (listOpen) return;
+  listOpen = true; listFocus = document.activeElement; findsPanel.hidden = true; hideHint();
+  renderList(); backdrop.hidden = false; plist.hidden = false;
+  requestAnimationFrame(() => { backdrop.classList.add("open"); plist.classList.add("open"); });
+  plist.querySelector("[data-close-list]").focus({ preventScroll: true });
+  try { if (location.hash !== "#projects") history.replaceState(null, "", "#projects"); } catch (_) {}
+}
+function closeList(quiet) {
+  if (!listOpen) return;
+  listOpen = false;
+  plist.classList.remove("open"); if (!quiet) backdrop.classList.remove("open");
+  setTimeout(() => { if (!listOpen) plist.hidden = true; if (!listOpen && !currentId) backdrop.hidden = true; }, REDUCED ? 0 : 260);
+  if (!quiet) {
+    try { history.replaceState(null, "", location.pathname + location.search); } catch (_) {}
+    if (listFocus && listFocus.focus) listFocus.focus({ preventScroll: true });
+  }
+}
+document.getElementById("btn-projects").addEventListener("click", openList);
+document.getElementById("btn-list").addEventListener("click", openList);
+// top bar: the info button opens the full intro and contact links; the first touch of the island tucks the headline away
+const mast = document.getElementById("mast"), btnAbout = document.getElementById("btn-about");
+function setIntro(open) { mast.classList.toggle("open", open); btnAbout.setAttribute("aria-expanded", String(open)); }
+btnAbout.addEventListener("click", () => { setIntro(!mast.classList.contains("open")); sfx.click(); });
+function played() { if (!scene.classList.contains("played")) { scene.classList.add("played"); hideHint(); } setIntro(false); }
+world.addEventListener("pointerdown", played);
+world.addEventListener("wheel", played, { passive: true });
+window.addEventListener("keydown", (e) => { if (e.key === "Escape" && mast.classList.contains("open")) setIntro(false); });
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") { if (currentId) close(); else findsPanel.hidden = true; }
-  if (e.key === "Tab" && currentId) {
-    const f = [...shop.querySelectorAll("a,button")]; if (!f.length) return;
+  if (e.key === "Escape") { if (listOpen) closeList(); else if (currentId) close(); else findsPanel.hidden = true; }
+  if (e.key === "Tab" && (currentId || listOpen)) {
+    const f = [...(listOpen ? plist : shop).querySelectorAll("a,button")]; if (!f.length) return;
     if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
     else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
   }
 });
-window.addEventListener("hashchange", () => { const id = location.hash.slice(1); if (id && id !== currentId) open(id); });
+window.addEventListener("hashchange", () => { const id = location.hash.slice(1); if (id === "projects") openList(); else if (id.startsWith("tour")) { if (!touring) startTour(id === "tour=clean"); } else if (id && id !== currentId) open(id); });
+
+/* ---------- Auto tour: ?tour or #tour flies to each building in turn and loops; ?tour=clean also hides the page chrome. Any tap or key stops it. ---------- */
+let touring = false, tourTimer = null;
+function stopTour() {
+  if (!touring) return;
+  touring = false; clearTimeout(tourTimer); hot(null);
+  document.body.classList.remove("touring", "tour-clean"); layout();
+}
+function startTour(clean) {
+  if (currentId) close(); if (listOpen) closeList();
+  touring = true; document.body.classList.add("touring");
+  if (clean) { document.body.classList.add("tour-clean"); layout(); }
+  let i = -1;
+  const step = () => {
+    if (!touring) return;
+    i++;
+    if (i >= APPS.length) { hot(null); flyTo(home, 1800); i = -1; tourTimer = setTimeout(step, 3400); return; }
+    const a = APPS[i];
+    hot(a.id); flyTo({ cx: a.x, cy: a.y - a.spot.h * .6, w: 380 }, 1600);
+    setTimeout(() => { if (touring) toast(`<b>${esc(a.name)}</b> · ${esc(a.place)}`); }, 900);
+    tourTimer = setTimeout(step, 3600);
+  };
+  flyTo(home, 600); tourTimer = setTimeout(step, 1400);
+}
+["pointerdown", "keydown", "wheel"].forEach((ev) => window.addEventListener(ev, () => { if (touring) stopTour(); }, { capture: true, passive: true }));
 
 /* ---------- Loop ---------- */
 function tick(now) {
@@ -1061,7 +1393,10 @@ layout();
 window.addEventListener("resize", layout);
 requestAnimationFrame(layout);
 requestAnimationFrame(tick);
-if (location.hash.length > 1) open(location.hash.slice(1));
+const tourQ = new URLSearchParams(location.search).get("tour");
+if (tourQ !== null) { scene.classList.add("played"); startTour(tourQ === "clean"); }
+else if (location.hash.startsWith("#tour")) { scene.classList.add("played"); startTour(location.hash === "#tour=clean"); }
+else if (location.hash === "#projects") openList(); else if (location.hash.length > 1) open(location.hash.slice(1));
 })();
 </script>
 
