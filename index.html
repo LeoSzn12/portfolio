@@ -112,6 +112,7 @@ a { color: inherit; }
 
 .masthead::before { content: ""; position: absolute; inset: 0 0 -36px 0; z-index: -1; pointer-events: none; background: linear-gradient(180deg, rgba(8, 20, 70, .6), rgba(8, 20, 70, .3) 65%, rgba(8, 20, 70, 0)); }
 .masthead .eyebrow, .masthead p.role { text-shadow: 0 1px 8px rgba(5, 8, 30, .7); }
+.masthead p.sub { margin: 0 0 4px; max-width: 52ch; }
 
 /* top bar: name, one line, Projects and an info button; the full intro is one tap away on phones */
 .masthead .bar { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
@@ -126,8 +127,14 @@ a { color: inherit; }
   .masthead { padding-top: calc(env(safe-area-inset-top, 0px) + 10px); padding-bottom: 10px; background: none; }
   .masthead::before { inset: 0 0 -24px 0; background: linear-gradient(180deg, rgba(8, 20, 70, .55), rgba(8, 20, 70, .25) 70%, rgba(8, 20, 70, 0)); transition: opacity .4s; }
   .masthead .eb-more { display: none; }
-  .masthead h1 { font-size: 16px; line-height: 1.2; margin: 2px 0 0; max-height: 3em; overflow: hidden; transition: max-height .35s ease, opacity .3s, margin .35s; }
-  .played .masthead h1 { max-height: 0; opacity: 0; margin: 0; }
+  .masthead .bar { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 0 12px; }
+  .masthead .who { display: contents; }
+  .masthead .eyebrow { grid-column: 1; grid-row: 1; }
+  .masthead .bar-btns { grid-column: 2; grid-row: 1; }
+  .masthead h1, .masthead p.sub { grid-column: 1 / -1; overflow: hidden; transition: max-height .35s ease, opacity .3s, margin .35s; }
+  .masthead h1 { font-size: 17px; line-height: 1.22; margin: 6px 0 0; max-height: 3.7em; }
+  .masthead p.sub { font-size: 12.5px; line-height: 1.35; margin: 3px 0 0; max-height: 2.8em; }
+  .played .masthead h1, .played .masthead p.sub { max-height: 0; opacity: 0; margin: 0; }
   .played .masthead::before { opacity: .45; }
   .masthead .intro { pointer-events: auto; display: none; margin-top: 10px; background: rgba(10, 16, 40, .94); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; box-shadow: 0 18px 40px rgba(0, 0, 0, .4); }
   .masthead.open .intro { display: block; }
@@ -309,7 +316,7 @@ a { color: inherit; }
 /* auto tour for recording: ?tour (or #tour); ?tour=clean hides the page chrome */
 .touring .hint { display: none; }
 .tour-clean .masthead, .tour-clean .board, .tour-clean .dock, .tour-clean .finds { display: none !important; }
-.tour-clean .toast { bottom: calc(env(safe-area-inset-bottom, 0px) + 28px); }
+.tour-clean .toast { top: auto; bottom: calc(env(safe-area-inset-bottom, 0px) + 28px); }
 .actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel-2); text-decoration: none; font-weight: 600; font-size: 14.5px; cursor: pointer; }
 .btn.primary { flex: 1 1 100%; background: var(--c); border-color: var(--c); color: #0a1026; box-shadow: 0 0 24px color-mix(in srgb, var(--c) 45%, transparent); }
@@ -350,7 +357,8 @@ a { color: inherit; }
       <div class="bar">
         <div class="who">
           <div class="eyebrow">Ankit Patel<span class="eb-more"> · Island Lab</span></div>
-          <h1>I ship real apps by directing AI agents</h1>
+          <h1>I'm not an engineer. I learned to build with AI, and now my apps are live.</h1>
+          <p class="sub">I try every new AI tool by building something real with it, one experiment at a time.</p>
         </div>
         <div class="bar-btns">
           <button type="button" class="cta-main" id="btn-projects">Projects</button>
@@ -358,7 +366,7 @@ a { color: inherit; }
         </div>
       </div>
       <div class="intro" id="intro">
-        <p>Not an engineer, a builder. I took Blink Stop from a web game to the App Store with Claude Code, and versions 1.0 and 1.0.1 shipped in November 2026. Immerse is live too, and five more are on the bench.<span class="lead-more"> Each building here is one of them.</span></p>
+        <p>I took Blink Stop from a web game to the App Store with Claude Code, and versions 1.0 and 1.0.1 shipped in November 2026. Immerse is live too, and five more are on the bench.<span class="lead-more"> Each building here is one of them.</span></p>
         <p class="role">Open to roles building with AI at labs and startups</p>
         <nav class="cta" aria-label="Contact">
           <a href="https://www.linkedin.com/in/ankitpatel12/" target="_blank" rel="noopener">LinkedIn</a>
